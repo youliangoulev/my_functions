@@ -1,0 +1,31 @@
+function out = fitampl( fig )
+%UNTITLED2 Summary of this function goes here
+
+
+
+%   Detailed explanation goes here
+% Upload figure data
+%===============================================
+
+y1=[];
+y2=[];
+mlop=[];
+ch=get(fig,'Children');
+l=get(ch,'Children');
+c=get(l,'Xdata');
+p=get(l,'Ydata');
+for i=1:length(p)
+
+  if (c{i}(1)<=9)&&(c{i}(length(c{i})>=14))
+      mlop=horzcat(mlop,mean(p{i}(12:14))-mean(p{i}(9:10)));
+                y1=horzcat(y1,p{i}(9:10));
+                y2=horzcat(y2,p{i}(12:14));
+  end                
+end
+m(1)=mean(mlop);
+m(2)=std(mlop);
+m(3)=mean(y2)-mean(y1);
+out=m;
+
+end
+

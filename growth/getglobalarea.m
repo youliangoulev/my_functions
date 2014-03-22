@@ -1,0 +1,22 @@
+function out = getglobalarea()
+%UNTITLED3 Summary of this function goes here
+%   Detailed explanation goes here
+global segmentation
+area(length(segmentation.cells1))=0;
+for i=1:length(segmentation.tcells1)
+    if segmentation.tcells1(i).Obj(1).area~=0
+        for j=1:length(segmentation.tcells1(i).Obj)
+        area(segmentation.tcells1(i).Obj(j).image)=area(segmentation.tcells1(i).Obj(j).image)+segmentation.tcells1(i).Obj(j).area;
+        end
+    end
+end
+a=area;
+c=0:length(a)-1;
+b=c.*3;
+out={b,a};
+figure;
+plot(b,a);
+end
+
+
+

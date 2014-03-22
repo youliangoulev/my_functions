@@ -1,0 +1,71 @@
+function [ out ] = figmean( fig,a  )
+%UNTITLED Summary of this function goes here
+%   Detailed explanation goes here
+
+ol=15;
+u=[];
+z=[]; 
+m=[];
+f1=[];
+x={};
+for i=1:10000
+    x{i}=[];
+end
+y=[];
+ch=get(fig,'Children');
+l=get(gca,'Children');
+c=get(l,'Xdata');
+p=get(l,'Ydata');
+for i=1:length(c)
+    
+ oll=mod( c{i}(1),15);
+    
+    
+  for j=1:length(c{i})
+      
+      c{i}(j)=c{i}(j)-oll;
+
+
+      
+  end
+end
+
+
+
+
+
+for i=1:length(c)
+  for j=1:length(c{i})
+      if c{i}(j)>0
+          round(c{i}(j))/ol+1
+        x{round(c{i}(j))/ol+1}=[x{round(c{i}(j))/ol+1},p{i}(j)];
+
+      end
+  end
+end
+out=x;
+figure
+for i=1:a/ol+1
+
+    y=[y,mean(x{i+0})];
+    m=[m,std(x{i+0})/sqrt(length(x{i+0}))];
+end
+for i=1:a/ol+1
+        u=[u,x{i+0}];
+    for w=1:length(x{i+0});
+        z=[z,i];
+    end
+end
+h=[0:ol:a];
+
+plot(h,y)
+figure
+errorbar(h,y,m)
+hold on;
+% w1=polyfit(z,u,1);
+% for i=1:length(h)
+%     f1=[f1,h(i)*w1(1)+w1(2)];
+% end
+% plot(h,f1);
+end
+

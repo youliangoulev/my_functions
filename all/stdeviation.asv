@@ -1,0 +1,27 @@
+function out = stdeviation
+%UNTITLED Summary of this function goes here
+%   Detailed explanation goes here
+
+global segmentation
+Xi={};
+m=[];
+l=[];
+for i=1:length(segmentation.tcells1)
+if segmentation.tcells1(i).Obj(1).n~=0
+    for u=1:length(segmentation.tcells1(i).Obj)
+        m=horzc[m,segmentation.tcells1(i).Obj(u).image];
+        l=[l,segmentation.tcells1(i).Obj(u).fluoVar(2)];
+    end;
+    Xi={Xi{:},[m,l]}
+end
+
+image;
+for i=1:length(Xi)
+    plot(Xi{i}(1),Xi{i}(2));
+    hold on
+end
+
+end
+
+end
+

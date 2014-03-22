@@ -1,0 +1,27 @@
+function [ output_args ] = figage_correl_up( fig,a )
+%UNTITLED Summary of this function goes here
+%   Detailed explanation goes here
+
+
+
+ch=get(fig,'Children');
+l=get(ch,'Children');
+c=get(l,'Xdata');
+p=get(l,'Ydata');
+
+for i=1:length(c)
+
+for j=1:length(c{i})
+    if p{i}(j)>a
+        z=[z,c{i}(j)];
+        break;
+    end
+end
+
+end
+figure
+
+scatter(u,z);
+
+end
+

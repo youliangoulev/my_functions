@@ -1,0 +1,22 @@
+function [ output_args ] = figmean( fig )
+%UNTITLED Summary of this function goes here
+%   Detailed explanation goes here
+
+x={};
+for i=1:500
+    x{i}=[];
+y=[];
+ch=get(fig,'Children');
+l=get(ch,'Children');
+c=get(l,'Xdata');
+p=get(l,'Ydata');
+
+for i=1:length(c)
+  for j=1:length(c{i})
+      x{c{i}(j)+1}}=[x{c{i}(j)+1}},p{i}(j)];
+  end
+end
+figure
+
+end
+

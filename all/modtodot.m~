@@ -1,0 +1,21 @@
+function [ out ] = modtodot( a , g , k , t )
+%UNTITLED Summary of this function goes here
+%   Detailed explanation goes here
+global segmentation;
+x=[];
+for i=1:length(segmentation.tcells1)
+    if (segmentation.tcells1(i).N>)&&(segmentation.tcells1(i).lastFrame>=t)
+       if segmentation.tcells1(i).detectionFrame<a
+           if ~isempty(segmentation.tcells1(i).daughterList)
+               for j=1:length(segmentation.tcells1(i).daughterList)
+                   if (segmentation.tcells1(segmentation.tcells1(i).daughterList(j)).detectionFrame<k)&&(segmentation.tcells1(segmentation.tcells1(i).daughterList(j)).detectionFrame>g)&&(segmentation.tcells1(segmentation.tcells1(i).daughterList(j)).lastFrame>=t)
+                       x=[x , segmentation.tcells1(i).Obj(t).fluoMean(2)-segmentation.tcells1(segmentation.tcells1(i).daughterList(j)).Obj(t).fluoMean(2)];
+                   end
+               end
+       end
+    end
+    end
+out=x;
+
+end
+

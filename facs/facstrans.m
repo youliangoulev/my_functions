@@ -1,0 +1,50 @@
+function [ al ] = facstrans(filenam,h2o2,time,xis)
+%UNTITLED Summary of this function goes here
+%   Detailed explanation goes here
+
+
+facsa.h2o2=h2o2;
+facsa.time=time;
+[data,params]=fcsread(filenam);
+facsa.nb=length(params);
+for i=1:facsa.nb
+    if params(i).Amplification(1)==0
+      facsa.param(i).values=data(:,i);
+      facsa.param(i).mean=mean(data(:,i));
+      facsa.param(i).std=std(data(:,i));
+      facsa.param(i).ster=facsa.param(i).std/sqrt(length(facsa.param(i).values));
+      facsa.param(i).cv=facsa.param(i).std/facsa.param(i).mean;
+    else
+      dmlop=params(i).Range/params(i).Amplification(1);
+      facsa.param(i).values=10.^(data(:,i)./dmlop);
+      facsa.param(i).mean=mean(facsa.param(i).values);
+      facsa.param(i).std=std(facsa.param(i).values);
+      facsa.param(i).ster=facsa.param(i).std/sqrt(length(facsa.param(i).values));
+      facsa.param(i).cv=facsa.param(i).std/facsa.param(i).mean;
+    end
+    facsa.(params(i).LongName(1:3))=facsa.param(i);
+    facsa.param(i).nom=params(i).LongName;
+end
+al=facsa;
+if xis==1
+liko=figure('Name',['H2O2: ' num2str(h2o2) 'mM' ' /' ' '  'Time: ' num2str(time) 'min post stress' ]);
+a=get(liko,'OuterPosition');
+set(liko,'OuterPosition',[a(1) a(2 ) a(3)*2 a(4)/2]);
+subplot(1,3,1), dscatter(facsa.FSC.values,facsa.SSC.values);
+xlabel('FSC'); 
+ylabel('SSC');
+subplot(1,3,2), dscatter(facsa.FSC.values,facsa.GFP.values);
+xlabel('FSC'); 
+ylabel('GFP');
+subplot(1,3,3), hist(facsa.GFP.values, max(facsa.GFP.values)-min(facsa.GFP.values));
+xlabel('GFP'); 
+ylabel('Count');
+axis(subplot(1,3, 2), [0 1000 0 400]);
+axis(subplot(1,3,1), [0 1000 0 1000]);
+v=axis(subplot(1,3,3));
+axis(subplot(1,3,3), [0 200 v(3) v(4)]);
+texte={['Mean: ', num2str(facsa.GFP.mean)]  ['Std: ' , num2str(facsa.GFP.std)]  ['Cv: ' , num2str(facsa.GFP.cv)]};
+annotation('textbox', [.91 .4 .1 .5], 'FitHeightToText', 'ON' , 'EdgeColor', 'none' , 'Fontsize', 10, 'String', texte);
+end
+end
+

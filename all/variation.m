@@ -1,0 +1,83 @@
+function [ output_args ] = variation( fig )
+%UNTITLED Summary of this function goes here
+%   Detailed explanation goes here
+
+
+u=[];
+z=[]; 
+m=[];
+lmpo=[];
+f1=[];
+x={};
+mlop=[];
+e=[];
+
+for i=1:10000
+    x{i}=[];
+end
+y=[];
+ch=get(fig,'Children');
+l=get(ch,'Children');
+c=get(l,'Xdata');
+p=get(l,'Ydata');
+
+for i=1:length(c)
+  for j=1:length(c{i})
+      if c{i}(j)>0
+          x{c{i}(j)+1}=[x{c{i}(j)+1},p{i}(j)];
+      end
+  end
+end
+figure
+for i=1:3:1000
+
+    y=[y,mean(x{i+0})];
+end  
+
+a=mean(y(45:65))-150;
+
+for j=1:length(y)
+    
+    y(j)=y(j)-a;
+    
+end
+for i=1:3:1000
+flom=x{i+0}-a;
+    y=[y,mean(x{i+0})];
+    m=[m,std(flom)/(mean(flom))];
+    lmpo=[lmpo,std(x{i+0})];
+    mlop=[mlop, 1./sqrt(mean(x{i+0}))];
+    
+    if length(flom) ~= 0
+       [bootstat] = bootstrp(1000,@coefvar,flom); 
+        e=[e, std(bootstat)];
+    else
+       e=[e,0] ;
+    end
+end
+
+% for i=1:3:1000
+%         u=[u,x{i+0}];
+%     for w=1:length(x{i+0})
+%         z=[z,i];
+%     end
+% end
+h=[0:3:999]
+plot(h,m,'LineWidth',2);
+hold on
+plot(h,mlop, 'r', 'LineWidth',2);
+figure 
+scatter(y(66:96),lmpo(66:96),'.','LineWidth',2);
+figure
+
+errorbar(h,m,e , 'LineWidth',2);
+
+% errorbar(h,y,m)
+% hold on;
+% w1=polyfit(z,u,1);
+% for i=1:length(h)
+%     f1=[f1,h(i)*w1(1)+w1(2)]
+% end
+% plot(h,f1);
+end
+
