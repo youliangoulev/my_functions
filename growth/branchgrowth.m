@@ -40,6 +40,15 @@ for i=1:length(gen)
     all=[all , gen{i}];
 end;
 
+gen
+m=0;
+for i=1:length(all)
+    if segmentation.tcells1(all(i)).lastFrame<b
+        m=m+1;
+    end;
+end;
+m/length(all)
+
 %========================================================
 
 totarea=zeros(1 , b-a+1);
