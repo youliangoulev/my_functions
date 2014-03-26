@@ -47,9 +47,7 @@ for i=1:length(all)
     end;
 end;
 
-disp(['total cells = ' num2str(length(all))]);
-disp(['lost cells = ' num2str(m)]);
-disp(['ratio = ' num2str(m/length(all))]);
+m/length(all)
 
 %========================================================
 
@@ -66,8 +64,6 @@ end;
 time=(a-1)*framet:framet:(b-1)*framet;
 figure;
 plot(time , totarea);
-figure;
-plot(time , log(totarea));
 
 end
 
