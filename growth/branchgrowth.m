@@ -40,18 +40,38 @@ for i=1:length(gen)
     all=[all , gen{i}];
 end;
 
-m=0;
+time1=0:framet:(b-1)*framet;m=0;
+lm=zeros(1 , b);
 for i=1:length(all)
-    if segmentation.tcells1(all(i)).lastFrame<b
+    if segmentation.tcells1(all(i)).lastFrame<=b
+        lm(segmentation.tcells1(all(i)).lastFrame)=lm(segmentation.tcells1(all(i)).lastFrame)+1;
         m=m+1;
     end;
 end;
 
 disp(['total cells = ' num2str(length(all))]);
 disp(['lost cells = ' num2str(m)]);
-disp(['ratio = ' num2str(m/length(all))]);
+disp(['ratio lost/total= ' num2str(m/length(all))]);
+figure;
+bar(time1 , lm);
 
 %========================================================
+
+
+nom=zeros(1 , b);
+nomt=0;
+for i=1:length(segmentation.tcells1)
+    if (segmentation.tcells1(i).mother==0)&&(segmentation.tcells1(i).detectionFrame<=b)
+        
+        nom(segmentation.tcells1(i).detectionFrame)=nom(segmentation.tcells1(i).detectionFrame)+1;
+        nomt=nomt+1;
+    end;
+end;
+%========================================================
+disp(['no mother cells = ' num2str(nomt)]);
+disp(['ratio no mother/total = ' num2str(nomt/length(all))]);
+figure;
+bar(time1 , nom);
 
 totarea=zeros(1 , b-a+1);
 
