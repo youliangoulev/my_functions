@@ -1,7 +1,9 @@
 function [celltfluo , cellcfluo , cellnfluo ,  cellnenrfluo , cellarea , celltime] = nucfluoverall2(resolution ,chanelfluo)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
-bgd=750;
+bgd=600;
+difcyt=0.7;
+inc=0.7;
 global segmentation
 
 cha=chanelfluo;
@@ -86,16 +88,16 @@ nenrfluo=[];
 for j=celapp(ii):length(segmentation.tcells1(i).Obj)    
     if doublets{ii}(j)==0
     totarea=segmentation.tcells1(i).Obj(j).area;
-    tot=(segmentation.tcells1(i).Obj(j).fluoMean(cha)-bgd)*totarea;
+    tot=(segmentation.tcells1(i).Obj(j).fluoMean(cha)-bgd-segmentation.tcells1(i).Obj(j).image*inc)*totarea;
          if segmentation.tcells1(i).Obj(j).Mean.n>0
              n=segmentation.tcells1(i).Obj(j).Mean.n;
              time=segmentation.tcells1(i).Obj(j).image;
              nt=time-segmentation.tnucleus(n).detectionFrame+1;
              nucarea=segmentation.tnucleus(n).Obj(nt).area;
-             nuc=(segmentation.tnucleus(n).Obj(nt).fluoMean(cha)-bgd)*nucarea;
+             nuc=(segmentation.tnucleus(n).Obj(nt).fluoMean(cha)-bgd-segmentation.tnucleus(n).Obj(nt).image*inc)*nucarea;
              cyt=(tot-nuc);
              cytbe=cyt/(totarea-nucarea);
-             nucenr=(nuc-cytbe*nucarea)/tot; 
+             nucenr=(nuc-cytbe*nucarea*difcyt)/tot; 
          else
              nuc=0;
              nucarea=0;
@@ -105,13 +107,13 @@ for j=celapp(ii):length(segmentation.tcells1(i).Obj)
     else
 diff=segmentation.tcells1(doublets{ii}(j)).detectionFrame-segmentation.tcells1(i).detectionFrame;
 totarea=segmentation.tcells1(i).Obj(j).area+segmentation.tcells1(doublets{ii}(j)).Obj(j-diff).area;
-tot=((segmentation.tcells1(i).Obj(j).fluoMean(cha)-bgd)*segmentation.tcells1(i).Obj(j).area+(segmentation.tcells1(doublets{ii}(j)).Obj(j-diff).fluoMean(cha)-bgd)*segmentation.tcells1(doublets{ii}(j)).Obj(j-diff).area);
+tot=((segmentation.tcells1(i).Obj(j).fluoMean(cha)-bgd-segmentation.tcells1(i).Obj(j).image*inc)*segmentation.tcells1(i).Obj(j).area+(segmentation.tcells1(doublets{ii}(j)).Obj(j-diff).fluoMean(cha)-bgd-segmentation.tcells1(doublets{ii}(j)).Obj(j-diff).image*inc)*segmentation.tcells1(doublets{ii}(j)).Obj(j-diff).area);
          if segmentation.tcells1(i).Obj(j).Mean.n>0
              n=segmentation.tcells1(i).Obj(j).Mean.n;
              time=segmentation.tcells1(i).Obj(j).image;
              nt=time-segmentation.tnucleus(n).detectionFrame+1;
              nucareax=segmentation.tnucleus(n).Obj(nt).area;
-             nucx=(segmentation.tnucleus(n).Obj(nt).fluoMean(cha)-bgd)*nucareax;
+             nucx=(segmentation.tnucleus(n).Obj(nt).fluoMean(cha)-bgd-segmentation.tnucleus(n).Obj(nt).image*inc)*nucareax;
          else
              nucx=0;
              nucareax=0;
@@ -121,7 +123,7 @@ tot=((segmentation.tcells1(i).Obj(j).fluoMean(cha)-bgd)*segmentation.tcells1(i).
              time=segmentation.tcells1(doublets{ii}(j)).Obj(j-diff).image;
              nt=time-segmentation.tnucleus(n).detectionFrame+1;
              nucareay=segmentation.tnucleus(n).Obj(nt).area;
-             nucy=(segmentation.tnucleus(n).Obj(nt).fluoMean(cha)-bgd)*nucareay;
+             nucy=(segmentation.tnucleus(n).Obj(nt).fluoMean(cha)-bgd-segmentation.tnucleus(n).Obj(nt).image*inc)*nucareay;
          else
              nucy=0;
              nucareay=0;
@@ -131,7 +133,7 @@ tot=((segmentation.tcells1(i).Obj(j).fluoMean(cha)-bgd)*segmentation.tcells1(i).
         nucarea=(nucareax+nucareay);
         cyt=tot-nuc;
         cytbe=cyt/(totarea-nucarea);
-        nucenr=(nuc-cytbe*nucarea)/tot;  %
+        nucenr=(nuc-cytbe*nucarea*difcyt)/tot;  %
         else
              nuc=0;
              nucarea=0;
