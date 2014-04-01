@@ -23,11 +23,8 @@ celtfluo={};
 celnenrfluo={};
 celtest={};
 goodcell=[];
-%filter
-%=======================================
 for i=1:length(segmentation.tcells1)
     if ((segmentation.tcells1(i).mother>0) || (segmentation.tcells1(i).detectionFrame==1))&&(length(segmentation.tcells1(i).Obj)>1)&&(segmentation.tcells1(i).birthFrame<segmentation.tcells1(i).lastFrame)
-        
         goodcell=[goodcell , i];
     end;
 end;
@@ -58,7 +55,7 @@ for i=goodcell
 end;
 %========================================
 
-%celdoublets + %filter
+%celdoublets
 %========================================
 for i=goodcell   
  if isempty(segmentation.tcells1(i).daughterList)
@@ -183,8 +180,8 @@ tot=((segmentation.tcells1(i).Obj(j).fluoMean(cha)-bgd-segmentation.tcells1(i).O
       prob=true;
       disp(['attention !!! cell ' , num2str(doublets{ii}(j)) , 'not present at frame ' , num2str(segmentation.tcells1(doublets{ii}(j)).Obj(j-diff).image)]);
   end;
-              nucstep=((nucx-cyt1*difcyt)*nucareax+(nucy-cyt2*difcyt)*nucareay)/(nucareax+nucareay); 
-              nucenr=(nucstep)/(tot);
+             
+              nucenr=(nuc-cyt*difcyt)/(tot);
         else
              nuc=0;
              nucarea=0;
