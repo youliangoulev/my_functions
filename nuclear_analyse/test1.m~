@@ -121,9 +121,6 @@ if length(indic1)>1
     else
         kfinde=k(indic2);
     end;
-else
-    kfinde=k(indic1);
-    
 end;
 a=esize;
 b=efluo;
