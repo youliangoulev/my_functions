@@ -1,0 +1,442 @@
+function [a]=test2(resolution ,chanelfluo)
+%UNTITLED Summary of this function goes here
+%   Detailed explanation goes here
+
+global segmentation;
+celimitn=300;
+alpha=0.05; 
+
+
+cha=chanelfluo;
+
+
+
+
+totev=0;
+totelmev=0;
+maxier=0;
+eler=0;
+maxgd=0;
+keegd=0;
+cellength=[];
+
+for i=1:length(segmentation.tcells1)   
+    if segmentation.tcells1(i).N>0
+    cellength=[cellength , length(segmentation.tcells1(i).Obj)];
+    else
+    cellength=[cellength , 0];
+    end;
+end;
+
+%$$$$$$$$$$$$$$$$$$$$$$$$$
+
+
+
+
+
+
+
+%$$$$$$$$$$$$$$$$$$$$$$$$$
+
+
+
+
+
+celnu000=[];
+framnu000=[];
+etime000=[];
+efluo000=[];
+esize000=[];
+
+
+%======
+dal=length(segmentation.tcells1);
+sqi=0;
+h11=waitbar(0 , 'estimation of the distributions of the differences between frames');
+%======
+
+
+
+
+
+%=
+%=
+%=
+for i=1:length(segmentation.tcells1)   
+    if length(segmentation.tcells1(i).Obj)>1
+        for j=2:length(segmentation.tcells1(i).Obj)
+            esize000=[esize000 , (segmentation.tcells1(i).Obj(j).area-segmentation.tcells1(i).Obj(j-1).area)];
+            efluo000=[efluo000 , (segmentation.tcells1(i).Obj(j).fluoMean(cha)-segmentation.tcells1(i).Obj(j-1).fluoMean(cha))];
+            etime000=[etime000 , (segmentation.tcells1(i).Obj(j).image)];
+            celnu000=[celnu000 , i];
+            framnu000=[framnu000 , j];
+            
+            
+        end;
+    end;
+    
+%==========    
+sqi=sqi+1;    
+if (sqi/dal>=0.01)||(i/dal==1)
+    sqi=0;
+    waitbar(i/dal, h11);
+end;
+%==========
+
+end;
+%=
+%=
+%=
+
+
+
+
+%==========
+close(h11);
+drawnow;
+%==========
+
+%++++++++++++++++
+%++++++++++++++++
+
+%#########################################################################
+
+temiii=1:length(etime000);
+maxtim=max(etime000);
+mmp=2;
+nnp=2;
+before=true;
+
+while (sum((etime000>=mmp)&&(etime000<=nnp))<celimitn)&&(nnp<maxtim)
+    nnp=nnp+1;
+end;
+matcompx=(etime000>=mmp)&&(etime000<=nnp);
+comparex=temiii(matcompx);   
+
+while before
+efluo=[];
+etime=[];
+esize=[];
+celnu=[];
+framnu=[];
+
+lo=[];
+tlo=[];
+
+k=[];
+c=[];
+
+signi=[];
+x=[];
+xr=[];
+
+compare=comparex;
+
+efluo=efluo000(compare);
+esize=esize000(compare);
+
+etime=etime000(compare);
+celnu=celnu000(compare);
+framnu=framnu000(compare);
+
+if nnp==maxtim
+   before=false; 
+end;
+
+if before
+stillin=true;    
+ while stillin   
+    mmp=nnp+1;
+    nnp=mmp;
+    
+    while (sum((etime000>=mmp)&&(etime000<=nnp))<celimitn)&&(nnp<maxtim)
+    nnp=nnp+1;
+    end;
+    matcompx=(etime000>=mmp)&&(etime000<=nnp);
+    comparex=temiii(matcompx);
+    if (sum((etime000>=mmp)&&(etime000<=nnp))>=celimitn)
+        [dddd,ppt1]=ttest2(esize000(compare) , esize000(comparex));
+        [dddd,ppv1]=vartest2(esize000(compare) , esize000(comparex));
+        [dddd,ppt2]=ttest2(efluo000(compare) , efluo000(comparex));
+        [dddd,ppv2]=vartest2(efluo000(compare) , efluo000(comparex));        
+        
+        
+        if (ppt1>alpha)&&(ppv1>alpha)&&(ppt2>alpha)&&(ppv2>alpha)
+            efluo=[efluo , efluo000(comparex)];
+            esize=[esize , esize000(comparex)];
+            etime=[etime , etime000(comparex)];
+            celnu=[celnu , celnu000(comparex)];
+            framnu=[framnu , framnu000(comparex)];
+            
+             if (nnp==maxtim)
+                 before=false;
+                 stillin=false;
+             end;
+        else     
+            stillin=false;
+        end;
+    else
+        efluo=[efluo , efluo000(comparex)];
+        esize=[esize , esize000(comparex)];
+        etime=[etime , etime000(comparex)];
+        celnu=[celnu , celnu000(comparex)];
+        framnu=[framnu , framnu000(comparex)];
+        before=false;
+        stillin=false;
+    end;
+    
+    
+ end; 
+end;
+
+[ddd , ppp1]=ttest(esize);
+[ddd , ppp2]=ttest(efluo);
+
+if ppp1<=alpha
+    esize=abs(esize-mean(esize));
+else
+    esize=abs(esize);
+end;
+
+if ppp2<=alpha
+    efluo=abs(efluo-mean(efluo));
+else
+    efluo=abs(efluo);
+  
+end;
+
+%==========
+dal=length(esize);
+sqi=0;
+h11=waitbar(0 , 'probabilities calculation');
+%==========
+
+%=
+%=
+%=
+for i=1:length(esize)    
+             produit=sum((esize>=esize(i))/length(esize))*(sum((efluo>=efluo(i))/length(efluo)));
+             k=[k , produit];
+             c=[c , produit*(1-log(produit))];
+             
+%==========             
+sqi=sqi+1;    
+if (sqi/dal>=0.01)||(i/dal==1)
+    sqi=0;
+    waitbar(i/dal, h11);
+end;
+%==========  
+
+end;
+%=
+%=
+%=
+
+%==========
+close(h11);
+drawnow;
+%==========
+
+%++++++++++++++++
+%++++++++++++++++
+
+n=length(k);
+
+%==========
+dal=n;
+sqi=0;
+h11=waitbar(0 , 'outlayers number estimation');
+%==========
+
+%=
+%=
+%=
+for i=1:n
+    la=sum(k<=k(i));
+    lo=[lo , la];
+    tlo=[tlo , n*c(i)];
+    if (1-c(i)>0)&&(lo(i)-tlo(i)>0)
+        x=[x , (lo(i)-tlo(i))/(1-c(i))];
+    else
+        x=[x , 0];
+    end;
+
+    if 1-binocdf(la-1 , n , c(i))<=0.05
+        signi=[signi , i];
+    end;
+    
+%==========             
+sqi=sqi+1;    
+if (sqi/dal>=0.01)||(i/dal==1)
+    sqi=0;
+    waitbar(i/dal, h11);
+end;
+%========== 
+    
+    
+end;
+%=
+%=
+%=
+
+%==========
+close(h11);
+drawnow;
+%==========
+
+%++++++++++++++++
+%++++++++++++++++
+
+if ~isempty(signi)
+
+maxx=max(x(signi));
+
+%=
+%=
+%=
+for i=1:n
+    xr=[xr , lo(i)-c(i)*(n-maxx)];
+end;
+%=
+%=
+%=
+
+opti1=0;
+indic1=[];
+indic2=[];
+indic3=[];
+for i=signi
+   if xr(i)*((n-maxx)*(1-c(i)))>opti1
+       opti1=xr(i)*((n-maxx)*(1-c(i)));
+       indic1=[];
+       indic1=[indic1 , i];
+   else
+       if xr(i)*((n-maxx)*(1-c(i)))==opti1
+           indic1=[indic1 , i];
+       end;
+   end;
+end;
+
+if length(indic1)>1
+    
+    opti2=1;
+    
+    for i=indic1
+        if abs((xr(i)/maxx)-(1-c(i)))<opti2
+            opti2=abs((xr(i)/maxx)-(1-c(i)));
+            indic2=[];
+            indic2=[indic2 , i];
+        else    
+            if abs((xr(i)/maxx)-(1-c(i)))==opti2
+               indic2=[indic2 , i]; 
+            end;
+        end;
+    end;
+   
+    if length(indic2)>1
+    
+    opti3=0;
+    
+    for i=indic2
+        if xr(i)>opti3
+            opti3=xr(i);
+            indic3=[];
+            indic3=[indic3 , i];
+        else    
+            if xr(i)==opti3
+               indic3=[indic3 , i]; 
+            end;
+        end;
+    end;
+    
+      if length(indic3)>1
+          kfinde=min(k(indic3));
+          for amw=indic3
+              if k(amw)==min(k(indic3))
+                  realindic=amw;
+              end;
+          end;
+      else
+          kfinde=k(indic3);
+          realindic=indic3;
+      end;
+    else
+        kfinde=k(indic2);
+        realindic=indic2;
+    end;
+else
+    kfinde=k(indic1);
+    realindic=indic1;
+    
+end;
+
+for i=1:length(k)
+    if k(i)<=kfinde
+        if cellength(celnu(i))>framnu(i)-1           
+           cellength(celnu(i))=framnu(i)-1;
+        end;
+    end;
+end;
+disp(' ');
+disp('--------------------------------------');
+disp(['Time from : ' , num2str(min(etime)*resolution-resolution) , 'min to ' , num2str(max(etime)*resolution-resolution) , 'min']);
+disp(' ');
+disp(['total events : ' , num2str(n)]);
+disp(['total eliminated events : ' , num2str(sum(k<=k(realinduc)))]);
+disp(['maximum detectable errors : ' , num2str(maxx)]);
+disp(['k seuil : ' , num2str(k(realinduc))]);
+disp(['eliminated errors : ' , num2str(xr(realindic))]);
+disp(['ratio eliminated errors / maximum errors : ' , num2str(xr(realinduc)/maxx)]);
+disp(['maximum good data : ' , num2str((n-maxx))]);
+disp(['conserved good data : ' , num2str((n-maxx)*(1-c(realinduc)))]);
+disp(['ratio conserved good data / maximum good data : ' , num2str((1-c(realinduc)))]);
+totev=totev+n;
+totelmev=totelmev+sum(k<=k(realinduc));
+maxier=maxier+maxx;
+eler=eler+xr(realindic);
+maxgd=maxgd+(n-maxx);
+keegd=keegd+(n-maxx)*(1-c(realinduc));
+disp('--------------------------------------');
+
+else
+
+disp(' ');
+disp('--------------------------------------');
+totev=totev+n;
+maxgd=maxgd+n;
+keegd=keegd+n;
+disp(['Time from : ' , num2str(min(etime)*resolution-resolution) , 'min to ' , num2str(max(etime)*resolution-resolution) , 'min']);
+disp(' ');
+disp('no errors detected');
+disp('--------------------------------------');
+
+end;
+
+
+%******************
+%++++++++++++++++++
+%==================
+
+
+
+end;
+
+%#########################################################################
+
+disp(' ');
+disp('#######################################');
+disp(' ');
+disp(['total events : ' , num2str(totev)]);
+disp(['total eliminated events : ' , num2str(totelmev)]);
+disp(['maximum detectable errors : ' , num2str(maxier)]);
+disp(['eliminated errors : ' , num2str(eler)]);
+disp(['ratio eliminated errors / maximum errors : ' , num2str(eler/maxier)]);
+disp(['maximum good data : ' , num2str(maxgd)]);
+disp(['conserved good data : ' , num2str(keegd)]);
+disp(['ratio conserved good data / maximum good data : ' , num2str(maxgd/keegd)]);
+disp(' ');
+
+a=cellength;
+
+end
+

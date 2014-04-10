@@ -15,7 +15,6 @@ efluo=[];
 etime=[];
 k=[];
 xr=[];
-%choosec=[];
 celnu=[];
 framnu=[];
 c=[];
@@ -23,11 +22,16 @@ tlo=[];
 signi=[];
 x=[];
 cellength=[];
+
 %======
 dal=length(segmentation.tcells1);
 sqi=0;
 h11=waitbar(0 , 'estimation of the distributions of the differences between frames');
 %======
+
+%=
+%=
+%=
 for i=1:length(segmentation.tcells1)   
     if segmentation.tcells1(i).N>0
     cellength=[cellength , length(segmentation.tcells1(i).Obj)];
@@ -35,15 +39,17 @@ for i=1:length(segmentation.tcells1)
     cellength=[cellength , 0];
     end;
     if length(segmentation.tcells1(i).Obj)>1
-        %choosec=[choosec , i];
         for j=2:length(segmentation.tcells1(i).Obj)
             esize=[esize , abs(segmentation.tcells1(i).Obj(j).area-segmentation.tcells1(i).Obj(j-1).area)];
             efluo=[efluo , abs(segmentation.tcells1(i).Obj(j).fluoMean(cha)-segmentation.tcells1(i).Obj(j-1).fluoMean(cha))];
             etime=[etime , abs(segmentation.tcells1(i).Obj(j).image*resolution-resolution)];
             celnu=[celnu , i];
             framnu=[framnu , j];
+            
+            
         end;
     end;
+    
 %==========    
 sqi=sqi+1;    
 if (sqi/dal>=0.01)||(i/dal==1)
@@ -51,32 +57,56 @@ if (sqi/dal>=0.01)||(i/dal==1)
     waitbar(i/dal, h11);
 end;
 %==========
+
 end;
+%=
+%=
+%=
+
+
 %==========
 close(h11);
 drawnow;
 %==========
+
+%++++++++++++++++
+%++++++++++++++++
+
+
 %==========
 dal=length(esize);
 sqi=0;
 h11=waitbar(0 , 'probabilities calculation');
 %==========
+
+%=
+%=
+%=
 for i=1:length(esize)    
              produit=sum((esize>=esize(i))/length(esize))*(sum((efluo>=efluo(i))/length(efluo)));
              k=[k , produit];
              c=[c , produit*(1-log(produit))];
+             
 %==========             
 sqi=sqi+1;    
 if (sqi/dal>=0.01)||(i/dal==1)
     sqi=0;
     waitbar(i/dal, h11);
 end;
-%==========             
+%==========  
+
 end;
+%=
+%=
+%=
+
 %==========
 close(h11);
 drawnow;
 %==========
+
+%++++++++++++++++
+%++++++++++++++++
 
 n=length(k);
 
@@ -86,12 +116,14 @@ sqi=0;
 h11=waitbar(0 , 'outlayers number estimation');
 %==========
 
-
+%=
+%=
+%=
 for i=1:n
     la=sum(k<=k(i));
     lo=[lo , la];
     tlo=[tlo , n*c(i)];
-    if (c(i)>0)&&(lo(i)-tlo(i)>0)
+    if (1-c(i)>0)&&(lo(i)-tlo(i)>0)
         x=[x , (lo(i)-tlo(i))/(1-c(i))];
     else
         x=[x , 0];
@@ -111,17 +143,31 @@ end;
     
     
 end;
+%=
+%=
+%=
 
 %==========
 close(h11);
 drawnow;
 %==========
 
+%++++++++++++++++
+%++++++++++++++++
+
+if ~isempty(signi)
+
 maxx=max(x(signi));
 
+%=
+%=
+%=
 for i=1:n
     xr=[xr , lo(i)-c(i)*(n-maxx)];
 end;
+%=
+%=
+%=
 
 opti1=0;
 indic1=[];
@@ -173,6 +219,11 @@ if length(indic1)>1
     
       if length(indic3)>1
           kfinde=min(k(indic3));
+          for amw=indic3
+              if k(amw)==min(k(indic3))
+                  realindic=amw;
+              end;
+          end;
       else
           kfinde=k(indic3);
           realindic=indic3;
@@ -190,7 +241,7 @@ end;
 for i=1:length(k)
     if k(i)<=kfinde
         if cellength(celnu(i))>framnu(i)-1           
-           cellength(i)=framnu(i)-1;
+           cellength(celnu(i))=framnu(i)-1;
         end;
     end;
 end;
@@ -204,8 +255,16 @@ disp('maximum good data : ' , num2str((n-maxx)));
 disp('keeped good data : ' , num2str((n-maxx)*(1-c(realinduc))));
 disp('ratio keeped good data / maximum good data : ' , num2str((1-c(realinduc))));
 disp('total eliminated events : ' , num2str(sum(k<=k(realinduc))));
+else
+disp('no errors detected');
+
+end;
 
 
+
+%******************
+%++++++++++++++++++
+%==================
 a=cellength;
 
 end
