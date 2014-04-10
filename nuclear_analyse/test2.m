@@ -433,7 +433,7 @@ disp(['eliminated errors : ' , num2str(eler)]);
 disp(['ratio eliminated errors / maximum errors : ' , num2str(eler/maxier)]);
 disp(['maximum good data : ' , num2str(maxgd)]);
 disp(['conserved good data : ' , num2str(keegd)]);
-disp(['ratio conserved good data / maximum good data : ' , num2str(maxgd/keegd)]);
+disp(['ratio conserved good data / maximum good data : ' , num2str(keegd/maxgd)]);
 disp(' ');
 
 a=cellength;
