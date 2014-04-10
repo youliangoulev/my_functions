@@ -1,4 +1,4 @@
-function [a , b , c , d]=test1(resolution ,chanelfluo)
+function [a]=test1(resolution ,chanelfluo)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -15,17 +15,27 @@ efluo=[];
 etime=[];
 k=[];
 xr=[];
-choosec=[];
+%choosec=[];
 celnu=[];
 framnu=[];
 c=[];
 tlo=[];
 signi=[];
 x=[];
-
-for i=1:length(segmentation.tcells1)
+cellength=[];
+%======
+dal=length(segmentation.tcells1);
+sqi=0;
+h11=waitbar(0 , 'estimation of the distributions of the differences between frames');
+%======
+for i=1:length(segmentation.tcells1)   
+    if segmentation.tcells1(i).N>0
+    cellength=[cellength , length(segmentation.tcells1(i).Obj)];
+    else
+    cellength=[cellength , 0];
+    end;
     if length(segmentation.tcells1(i).Obj)>1
-        choosec=[choosec , i];
+        %choosec=[choosec , i];
         for j=2:length(segmentation.tcells1(i).Obj)
             esize=[esize , abs(segmentation.tcells1(i).Obj(j).area-segmentation.tcells1(i).Obj(j-1).area)];
             efluo=[efluo , abs(segmentation.tcells1(i).Obj(j).fluoMean(cha)-segmentation.tcells1(i).Obj(j-1).fluoMean(cha))];
@@ -34,16 +44,48 @@ for i=1:length(segmentation.tcells1)
             framnu=[framnu , j];
         end;
     end;
+%==========    
+sqi=sqi+1;    
+if (sqi/dal>=0.01)||(i/dal==1)
+    sqi=0;
+    waitbar(i/dal, h11);
 end;
-
+%==========
+end;
+%==========
+close(h11);
+drawnow;
+%==========
+%==========
+dal=length(esize);
+sqi=0;
+h11=waitbar(0 , 'probabilities calculation');
+%==========
 for i=1:length(esize)    
              produit=sum((esize>=esize(i))/length(esize))*(sum((efluo>=efluo(i))/length(efluo)));
              k=[k , produit];
-             c=[c , produit*(1-ln(produit))];
+             c=[c , produit*(1-log(produit))];
+%==========             
+sqi=sqi+1;    
+if (sqi/dal>=0.01)||(i/dal==1)
+    sqi=0;
+    waitbar(i/dal, h11);
 end;
-
+%==========             
+end;
+%==========
+close(h11);
+drawnow;
+%==========
 
 n=length(k);
+
+%==========
+dal=n;
+sqi=0;
+h11=waitbar(0 , 'outlayers number estimation');
+%==========
+
 
 for i=1:n
     la=sum(k<=k(i));
@@ -54,11 +96,26 @@ for i=1:n
     else
         x=[x , 0];
     end;
-    
-    if 1-binocdf(la-1 , n , c(i))>=0.05
+
+    if 1-binocdf(la-1 , n , c(i))<=0.05
         signi=[signi , i];
     end;
+    
+%==========             
+sqi=sqi+1;    
+if (sqi/dal>=0.01)||(i/dal==1)
+    sqi=0;
+    waitbar(i/dal, h11);
 end;
+%========== 
+    
+    
+end;
+
+%==========
+close(h11);
+drawnow;
+%==========
 
 maxx=max(x(signi));
 
@@ -125,10 +182,19 @@ else
     kfinde=k(indic1);
     
 end;
-a=esize;
-b=efluo;
-c=etime;
-d=k;
+
+for i=1:length(k)
+    if k(i)<=kfinde
+        if cellength(celnu(i))>framnu(i)-1           
+           cellength(i)=framnu(i)-1;
+        end;
+    end;
+end;
+
+
+
+
+a=cellength;
 
 end
 
