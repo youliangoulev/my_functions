@@ -107,10 +107,10 @@ mmp=2;
 nnp=2;
 before=true;
 
-while (sum((etime000>=mmp)&&(etime000<=nnp))<celimitn)&&(nnp<maxtim)
+while (sum((etime000>=mmp)&(etime000<=nnp))<celimitn)&&(nnp<maxtim)
     nnp=nnp+1;
 end;
-matcompx=(etime000>=mmp)&&(etime000<=nnp);
+matcompx=(etime000>=mmp)&(etime000<=nnp);
 comparex=temiii(matcompx);   
 
 while before
@@ -149,12 +149,12 @@ stillin=true;
     mmp=nnp+1;
     nnp=mmp;
     
-    while (sum((etime000>=mmp)&&(etime000<=nnp))<celimitn)&&(nnp<maxtim)
+    while (sum((etime000>=mmp)&(etime000<=nnp))<celimitn)&&(nnp<maxtim)
     nnp=nnp+1;
     end;
-    matcompx=(etime000>=mmp)&&(etime000<=nnp);
+    matcompx=(etime000>=mmp)&(etime000<=nnp);
     comparex=temiii(matcompx);
-    if (sum((etime000>=mmp)&&(etime000<=nnp))>=celimitn)
+    if (sum((etime000>=mmp)&(etime000<=nnp))>=celimitn)
         [dddd,ppt1]=ttest2(esize000(compare) , esize000(comparex));
         [dddd,ppv1]=vartest2(esize000(compare) , esize000(comparex));
         [dddd,ppt2]=ttest2(efluo000(compare) , efluo000(comparex));
