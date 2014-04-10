@@ -382,20 +382,20 @@ disp('--------------------------------------');
 disp(['Time from : ' , num2str(min(etime)*resolution-resolution) , 'min to ' , num2str(max(etime)*resolution-resolution) , 'min']);
 disp(' ');
 disp(['total events : ' , num2str(n)]);
-disp(['total eliminated events : ' , num2str(sum(k<=k(realinduc)))]);
+disp(['total eliminated events : ' , num2str(sum(k<=k(realindic)))]);
 disp(['maximum detectable errors : ' , num2str(maxx)]);
-disp(['k seuil : ' , num2str(k(realinduc))]);
+disp(['k seuil : ' , num2str(k(realindic))]);
 disp(['eliminated errors : ' , num2str(xr(realindic))]);
-disp(['ratio eliminated errors / maximum errors : ' , num2str(xr(realinduc)/maxx)]);
+disp(['ratio eliminated errors / maximum errors : ' , num2str(xr(realindic)/maxx)]);
 disp(['maximum good data : ' , num2str((n-maxx))]);
-disp(['conserved good data : ' , num2str((n-maxx)*(1-c(realinduc)))]);
-disp(['ratio conserved good data / maximum good data : ' , num2str((1-c(realinduc)))]);
+disp(['conserved good data : ' , num2str((n-maxx)*(1-c(realindic)))]);
+disp(['ratio conserved good data / maximum good data : ' , num2str((1-c(realindic)))]);
 totev=totev+n;
-totelmev=totelmev+sum(k<=k(realinduc));
+totelmev=totelmev+sum(k<=k(realindic));
 maxier=maxier+maxx;
 eler=eler+xr(realindic);
 maxgd=maxgd+(n-maxx);
-keegd=keegd+(n-maxx)*(1-c(realinduc));
+keegd=keegd+(n-maxx)*(1-c(realindic));
 disp('--------------------------------------');
 
 else
