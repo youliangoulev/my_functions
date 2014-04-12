@@ -1,18 +1,22 @@
-function [a]=test2(resolution ,chanelfluo)
+function [aut]=outlayers(resolution ,chanelfluo)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
+
+%$$$$$$$$$$$$$$$$$$$$$$$$$
+
+celimitn=300; % min number of events to be scored (window of time)
+alpha=0.05; % p-value for testing mean and std between windows of min number of events
+certitudegoods=0.1; % tolerated relative error for estimation of the good events
+
+binseuil=0.011; %   0.002 for 60x obj   ||   0.011 for 100x obj
+ratior=2; %   1000 for 60x obj   ||   2 for 100x obj
+
+%$$$$$$$$$$$$$$$$$$$$$$$$$
+
 global segmentation;
-celimitn=300;
-alpha=0.05; 
-certitudegoods=0.1;
-binseuil=0.05; %0.002 for 60x obj   0.05 for 100x obj
-ratior=2; %1000 for 60x obj   2 for 100x obj
 
 cha=chanelfluo;
-
-
-
 
 totev=0;
 totelmev=0;
@@ -30,18 +34,8 @@ for i=1:length(segmentation.tcells1)
     end;
 end;
 
-%$$$$$$$$$$$$$$$$$$$$$$$$$
 
-
-
-
-
-
-
-%$$$$$$$$$$$$$$$$$$$$$$$$$
-
-
-
+%£££££££££££££££££££££££££
 
 
 celnu000=[];
@@ -382,6 +376,7 @@ keegd=keegd+(n-maxx)*(1-c(realindic));
 disp('--------------------------------------');
 
 else
+ 
     disp(' ');
     disp('--------------------------------------');
     totev=totev+n;
@@ -389,6 +384,21 @@ else
     keegd=keegd+n;
     disp(['Time from : ' , num2str(min(etime)*resolution-2*resolution) , 'min to ' , num2str(max(etime)*resolution-resolution) , 'min']);
     disp(' ');
+    disp(['total events : ' , num2str(n)]);
+    disp('can not remove errors efficiently');
+    disp('--------------------------------------');
+    
+end;
+
+else
+    disp(' ');
+    disp('--------------------------------------');
+    totev=totev+n;
+    maxgd=maxgd+n;
+    keegd=keegd+n;
+    disp(['Time from : ' , num2str(min(etime)*resolution-2*resolution) , 'min to ' , num2str(max(etime)*resolution-resolution) , 'min']);
+    disp(' ');
+    disp(['total events : ' , num2str(n)]);
     disp('no errors detected');
     disp('--------------------------------------');
 end;
@@ -401,6 +411,7 @@ disp('--------------------------------------');
 totev=totev+n;
 maxgd=maxgd+n;
 keegd=keegd+n;
+disp(['total events : ' , num2str(n)]);
 disp(['Time from : ' , num2str(min(etime)*resolution-resolution) , 'min to ' , num2str(max(etime)*resolution-resolution) , 'min']);
 disp(' ');
 disp('no errors detected');
@@ -432,7 +443,7 @@ disp(['conserved good data : ' , num2str(keegd)]);
 disp(['ratio conserved good data / maximum good data : ' , num2str(keegd/maxgd)]);
 disp(' ');
 
-a=cellength;
+aut=cellength;
 
 end
 

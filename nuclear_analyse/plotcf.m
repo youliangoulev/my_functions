@@ -1,4 +1,4 @@
-function plotnf( time , a , bornes_before , timelimite , smsp )
+function plotcf( time , a , bornes_before , timelimite , smsp )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -18,15 +18,6 @@ for i=b
     w{ii}=a{i}(time{i}<=timelimite);
 end;
 
-n=ii;
-
-for i=1:n
-    for j=1:length(w{i})
-        if (w{i}(j)==0)&&(j>1)      
-            w{i}(j)=w{i}(j-1); 
-        end;
-    end;
-end;
 
 colorses=hsv(ii);
 figure;
@@ -35,7 +26,7 @@ for i=1:ii
     hold on
 end;
 
-
+n=ii;
 
 zt=[];
 zw=[];
