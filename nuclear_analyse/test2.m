@@ -5,7 +5,9 @@ function [a]=test2(resolution ,chanelfluo)
 global segmentation;
 celimitn=300;
 alpha=0.05; 
-
+certitudegoods=0.1;
+binseuil=0.05; %   0.002 for 60x obj   ||   0.05 for 100x obj
+ratior=2; %   1000 for 60x obj   ||   2 for 100x obj
 
 cha=chanelfluo;
 
@@ -52,7 +54,7 @@ esize000=[];
 %======
 dal=length(segmentation.tcells1);
 sqi=0;
-h11=waitbar(0 , 'estimation of the distributions of the differences between frames');
+h11=waitbar(0 , 'estimation of the differences between frames');
 %======
 
 
@@ -205,11 +207,6 @@ else
   
 end;
 
-%==========
-dal=length(esize);
-sqi=0;
-h11=waitbar(0 , 'probabilities calculation');
-%==========
 
 %=
 %=
@@ -218,35 +215,19 @@ for i=1:length(esize)
              produit=sum((esize>=esize(i))/length(esize))*(sum((efluo>=efluo(i))/length(efluo)));
              k=[k , produit];
              c=[c , produit*(1-log(produit))];
-             
-%==========             
-sqi=sqi+1;    
-if (sqi/dal>=0.01)||(i/dal==1)
-    sqi=0;
-    waitbar(i/dal, h11);
-end;
-%==========  
+              
 
 end;
 %=
 %=
 %=
 
-%==========
-close(h11);
-drawnow;
-%==========
 
 %++++++++++++++++
 %++++++++++++++++
 
 n=length(k);
 
-%==========
-dal=n;
-sqi=0;
-h11=waitbar(0 , 'outlayers number estimation');
-%==========
 
 %=
 %=
@@ -255,23 +236,16 @@ for i=1:n
     la=sum(k<=k(i));
     lo=[lo , la];
     tlo=[tlo , n*c(i)];
-    if (1-c(i)>0)&&(lo(i)-tlo(i)>0)
+    if ((n-lo(i))>0)&&(sqrt(c(i)/(n-lo(i)))<certitudegoods)&&(1-c(i)>0)&&(lo(i)-tlo(i)>0)
         x=[x , (lo(i)-tlo(i))/(1-c(i))];
     else
         x=[x , 0];
     end;
 
-    if 1-binocdf(la-1 , n , c(i))<=0.05
+    if 1-binocdf(la-1 , n , c(i))<=binseuil
         signi=[signi , i];
     end;
-    
-%==========             
-sqi=sqi+1;    
-if (sqi/dal>=0.01)||(i/dal==1)
-    sqi=0;
-    waitbar(i/dal, h11);
-end;
-%========== 
+
     
     
 end;
@@ -279,10 +253,6 @@ end;
 %=
 %=
 
-%==========
-close(h11);
-drawnow;
-%==========
 
 %++++++++++++++++
 %++++++++++++++++
@@ -291,11 +261,17 @@ if ~isempty(signi)
 
 maxx=max(x(signi));
 
+if maxx>0
+
 %=
 %=
 %=
 for i=1:n
+   if x(i)>0
     xr=[xr , lo(i)-c(i)*(n-maxx)];
+   else
+    xr=[xr , 0];    
+   end;
 end;
 %=
 %=
@@ -305,8 +281,11 @@ opti1=0;
 indic1=[];
 indic2=[];
 indic3=[];
+
+
 for i=signi
-   if xr(i)*((n-maxx)*(1-c(i)))>opti1
+  if (xr(i)>=lo(i)/ratior)
+   if (xr(i)*((n-maxx)*(1-c(i)))>opti1)
        opti1=xr(i)*((n-maxx)*(1-c(i)));
        indic1=[];
        indic1=[indic1 , i];
@@ -315,7 +294,10 @@ for i=signi
            indic1=[indic1 , i];
        end;
    end;
+  end; 
 end;
+
+if opti1>0
 
 if length(indic1)>1
     
@@ -377,9 +359,10 @@ for i=1:length(k)
         end;
     end;
 end;
+
 disp(' ');
 disp('--------------------------------------');
-disp(['Time from : ' , num2str(min(etime)*resolution-resolution) , 'min to ' , num2str(max(etime)*resolution-resolution) , 'min']);
+disp(['Time from : ' , num2str(min(etime)*resolution-2*resolution) , 'min to ' , num2str(max(etime)*resolution-resolution) , 'min']);
 disp(' ');
 disp(['total events : ' , num2str(n)]);
 disp(['total eliminated events : ' , num2str(sum(k<=k(realindic)))]);
@@ -399,12 +382,42 @@ keegd=keegd+(n-maxx)*(1-c(realindic));
 disp('--------------------------------------');
 
 else
+ 
+    disp(' ');
+    disp('--------------------------------------');
+    totev=totev+n;
+    maxgd=maxgd+n;
+    keegd=keegd+n;
+    disp(['Time from : ' , num2str(min(etime)*resolution-2*resolution) , 'min to ' , num2str(max(etime)*resolution-resolution) , 'min']);
+    disp(' ');
+    disp(['total events : ' , num2str(n)]);
+    disp('can not remove errors efficiently');
+    disp('--------------------------------------');
+    
+end;
+
+else
+    disp(' ');
+    disp('--------------------------------------');
+    totev=totev+n;
+    maxgd=maxgd+n;
+    keegd=keegd+n;
+    disp(['Time from : ' , num2str(min(etime)*resolution-2*resolution) , 'min to ' , num2str(max(etime)*resolution-resolution) , 'min']);
+    disp(' ');
+    disp(['total events : ' , num2str(n)]);
+    disp('no errors detected');
+    disp('--------------------------------------');
+end;
+
+
+else
 
 disp(' ');
 disp('--------------------------------------');
 totev=totev+n;
 maxgd=maxgd+n;
 keegd=keegd+n;
+disp(['total events : ' , num2str(n)]);
 disp(['Time from : ' , num2str(min(etime)*resolution-resolution) , 'min to ' , num2str(max(etime)*resolution-resolution) , 'min']);
 disp(' ');
 disp('no errors detected');
