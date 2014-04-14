@@ -2,6 +2,13 @@ function plotnf( time , a , bornes_before , timelimite , smsp )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
+
+%================================
+
+fiting=1;
+
+%================================
+
 tim={};
 w={};
 
@@ -26,13 +33,6 @@ for i=1:n
             w{i}(j)=w{i}(j-1); 
         end;
     end;
-end;
-
-colorses=hsv(ii);
-figure;
-for i=1:ii
-    plot(tim{i} , smooth(w{i} , smsp) , 'color' , colorses(i,:) , 'LineWidth', 1.3);
-    hold on
 end;
 
 
@@ -70,8 +70,170 @@ for i=1:length(t)
 
 end;
 
-   figure;
-   errorbar(t , smooth(meanw , smsp) , stdew);
 
+   
+if fiting==1   
+   %%% operation on zt and wt :
+ 
+   x1=1;
+ x5=length(t);
+ [y3 , x3]=max(smooth(meanw , smsp));
+ xvar1=2:x3-1;
+ xvar2=x3+1:x5-1;
+ x2=[];
+ x4=[];
+ Q2=[];
+ 
+ 
+%======
+dal=length(xvar1);
+h11=waitbar(0 , 'fiting');
+%======  
+ 
+ 
+ for i=xvar1
+     for j=xvar2
+         x2=[x2 , i];
+         x4=[x4 , j];
+         zt1=zt((zt>=t(x1))&(zt<=t(i)));
+         zw1=zw((zt>=t(x1))&(zt<=t(i)));
+         zt2=zt((zt>=t(j))&(zt<=t(x5)));
+         zw2=zw((zt>=t(j))&(zt<=t(x5)));
+         prob1=polyfit(zt1 , zw1 , 1);
+         prob2=polyfit(zt2 , zw2 , 1);
+        a1=prob1(1);
+        b1=prob1(2);
+        a4=prob2(1);
+        b4=prob2(2);
+         a2=(y3-(a1*t(i)+b1))/(t(x3)-t(i));
+         b2=y3-a2*t(x3);
+         a3=((a4*t(j)+b4)-y3)/(t(j)-t(x3));
+         b3=y3-a3*t(x3);
+         Q=0;
+         for c=1:i
+             Q=Q+sum((zwr{c}-(a1*t(c)+b1)).*(zwr{c}-(a1*t(c)+b1)));
+         end;
+         for c=i+1:x3
+             Q=Q+sum((zwr{c}-(a2*t(c)+b2)).*(zwr{c}-(a2*t(c)+b2)));
+         end;
+         for c=x3+1:j
+             Q=Q+sum((zwr{c}-(a3*t(c)+b3)).*(zwr{c}-(a3*t(c)+b3)));
+         end;
+         for c=j+1:x5
+             Q=Q+sum((zwr{c}-(a4*t(c)+b4)).*(zwr{c}-(a4*t(c)+b4)));
+         end;
+         Q2=[Q2 , Q];
+     end; 
+%==========    
+
+    waitbar((i-1)/dal, h11);
+
+%==========
+ end;
+%==========
+close(h11);
+drawnow;
+%==========
+ 
+ [Q2m , indic]=min(Q2);
+ x2god=x2(indic);
+ x4god=x4(indic);
+ i=x2god;
+ j=x4god;
+zt1=zt((zt>=t(x1))&(zt<=t(i)));
+         zw1=zw((zt>=t(x1))&(zt<=t(i)));
+         zt2=zt((zt>=t(j))&(zt<=t(x5)));
+         zw2=zw((zt>=t(j))&(zt<=t(x5)));
+         prob1=polyfit(zt1 , zw1 , 1);
+         prob2=polyfit(zt2 , zw2 , 1);
+
+        a1=prob1(1);
+        b1=prob1(2);
+        a4=prob2(1);
+        b4=prob2(2);
+         a2=(y3-(a1*t(i)+b1))/(t(x3)-t(i));
+         b2=y3-a2*t(x3);
+         a3=((a4*t(j)+b4)-y3)/(t(j)-t(x3));
+         b3=y3-a3*t(x3); 
+         
+   fiiiii=figure;
+   set(fiiiii,'Position',[251 , 451 , 679 , 346]);
+   errorbar(t , smooth(meanw , smsp) , stdew);
+   
+set(gca,'XTick',t(x1):100:t(x5));
+set(gca,'YTick',0:0.2:2);
+set(gca,'XLim',[t(x1) , t(x5)]);
+set(gca,'YLim',[0 , 2]);
+
+set(gca,'FontSize',20)
+xlabel('Time (min)');
+ylabel('Yap1 nuclear enrichment');
+title('Yap1 activity');         
+         
+         
+         colorses=hsv(ii);
+fi=figure;
+set(fi,'Position',[251 , 451 , 679 , 346]);
+for i=1:ii
+    plot(tim{i} , smooth(w{i} , smsp) , 'color' , colorses(i,:) , 'LineWidth', 1.3);
+    hold on
+end;
+
+set(gca,'XTick',t(x1):100:t(x5));
+set(gca,'YTick',0:0.2:2);
+set(gca,'XLim',[t(x1) , t(x5)]);
+set(gca,'YLim',[0 , 2]);
+
+set(gca,'FontSize',20)
+xlabel('Time (min)');
+ylabel('Yap1 nuclear enrichment');
+title('Yap1 activity');
+
+
+
+   
+fii=figure;
+set(fii,'Position',[251 , 451 , 679 , 346]);
+errorbar(t , smooth(meanw , smsp) , stdew);
+
+hold on;
+plot(t(x1:x2god) , a1*t(x1:x2god)+b1 , 'color' , 'r' , 'LineWidth',2);
+hold on;
+plot(t(x2god:x3) , a2*t(x2god:x3) +b2 , 'color' , 'r', 'LineWidth',2);
+hold on;
+plot(t(x3:x4god) , a3*t(x3:x4god)+b3 , 'color' , 'r' , 'LineWidth',2);
+hold on;
+plot(t(x4god:x5) , a4*t(x4god:x5)+b4 , 'color' , 'r' , 'LineWidth',2);
+hold on;
+end;
+set(gca,'XTick',t(x1):100:t(x5));
+set(gca,'YTick',0:0.2:2);
+set(gca,'XLim',[t(x1) , t(x5)]);
+set(gca,'YLim',[0 , 2]);
+
+set(gca,'FontSize',20)
+xlabel('Time (min)');
+ylabel('Yap1 nuclear enrichment');
+title('Yap1 activity');
+moyenne1=[];
+moyenne2=[];
+for i=1:length(w)
+    if sum((tim{i}>=t(x1))&(tim{i}<=t(x2god)))>0
+    moyenne1=[moyenne1 , mean(w{i}((tim{i}>=t(x1))&(tim{i}<=t(x2god))))];
+    end;
+    if sum((tim{i}>=t(x4god))&(tim{i}<=t(x5)))>0
+    moyenne2=[moyenne2 , mean(w{i}((tim{i}>=t(x4god))&(tim{i}<=t(x5))))];
+    end;
+end;
+
+me1=mean(moyenne1);
+me2=mean(moyenne2);
+
+         pii=ranksum(moyenne1 , moyenne2);
+
+stringg = {['Mean 1 before stress : ' , num2str(me1)] , ['Mean 2 after adaptation : ' , num2str(me2)] , ['Mean 1 vs Mean 2 : p-value = ' , num2str(pii)] , ['Maximum amplitude : ' , num2str(y3-me1)] , ['Burst duration : ' , num2str(t(x4god)-t(x2god)) , ' min']};
+wax=annotation('textbox', [.139 .582 .1 .1], 'String', stringg , 'FontSize' , 14 , 'LineStyle' , 'none' , 'color' , 'g');
+ggwxa=get(wax , 'Position');
+set(wax , 'Position' , [.139 .582 ggwxa(3) ggwxa(4)]);
 end
 
