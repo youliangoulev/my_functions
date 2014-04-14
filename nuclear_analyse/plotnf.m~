@@ -212,7 +212,7 @@ else
 stringg='No significant Yap1 activation';
     
 end;
-wax=annotation('textbox', [.139 .582 .1 .1], 'String', stringg , 'FontSize' , 14 , 'LineStyle' , 'none' , 'color' , [0.16 , 0.58 , 0.27]);
+wax=annotation('textbox', [.139 .582 .1 .1], 'String', stringg , 'FontSize' , 14 , 'LineStyle' , 'none' , 'color' , 'g');
 ggwxa=get(wax , 'Position');
 set(wax , 'Position' , [posit(1)+0.015 , posit(2)+posit(4)-ggwxa(4)-0.018 , ggwxa(3) , ggwxa(4)]);
 
