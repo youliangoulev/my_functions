@@ -9,7 +9,7 @@ celimitn=300; % min number of events to be scored (window of time)
 alpha=0.05; % p-value for testing mean and std between windows of min number of events
 certitudegoods=0.1; % tolerated relative error for estimation of the good events
 
-binseuil=0.011; %   0.002 for 60x obj   ||   0.011 for 100x obj
+binseuil=0.0011; %   0.002 for 60x obj   ||   0.011 for 100x obj
 ratior=2; %   1000 for 60x obj   ||   2 for 100x obj
 
 %$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -437,7 +437,10 @@ disp(['total events : ' , num2str(totev)]);
 disp(['total eliminated events : ' , num2str(totelmev)]);
 disp(['maximum detectable errors : ' , num2str(maxier)]);
 disp(['eliminated errors : ' , num2str(eler)]);
+if maxier>0
 disp(['ratio eliminated errors / maximum errors : ' , num2str(eler/maxier)]);
+else   
+end;
 disp(['maximum good data : ' , num2str(maxgd)]);
 disp(['conserved good data : ' , num2str(keegd)]);
 disp(['ratio conserved good data / maximum good data : ' , num2str(keegd/maxgd)]);

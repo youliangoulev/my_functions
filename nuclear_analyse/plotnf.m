@@ -14,7 +14,7 @@ w={};
 
 b=[];
 for i=1:length(time)
-    if time{i}(1)<bornes_before
+    if (time{i}(1)<bornes_before)&&(a{i}(1)>0)
         b=[b , i];
     end;
 end;
@@ -165,7 +165,7 @@ zt1=zt((zt>=t(x1))&(zt<=t(i)));
 fii=figure;
 set(fii,'Position',[251 , 451 , 679 , 346]);
 errorbar(t , smooth(meanw , smsp) , stdew);
-if ranksum(zwr{x2god} , zwr{x3}) <= 0.05
+if ranksum(zwr{x2god} , zwr{x3}) <= 0.05   %
 hold on;
 plot(t(x1:x2god) , a1*t(x1:x2god)+b1 , 'color' , 'r' , 'LineWidth',2);
 hold on;
@@ -213,7 +213,7 @@ me1=mean(moyenne1);
 me2=mean(moyenne2);
 
          pii=ranksum(moyenne1 , moyenne2);
-if ranksum(zwr{x2god} , zwr{x3}) <= 0.05
+if ranksum(zwr{x2god} , zwr{x3}) <= 0.05  
 stringg = {['Mean1 before stress: ' , num2str(me1)] , ['Mean2 after adaptation: ' , num2str(me2)] , ['Mean1 vs Mean2: p-value = ' , num2str(pii)] , ['Maximum amplitude: ' , num2str(y3-(a1*t(x2god)+b1))] , ['Burst duration: ' , num2str(t(x4god)-t(x2god)) , ' min']};
 annotation('line' , [posit(1)+posit(3)*(x2god-1)/x5 , posit(1)+posit(3)*(x2god-1)/x5] , [posit(2) , posit(2)+posit(4)] , 'LineStyle' , '--');
 annotation('line' , [posit(1)+posit(3)*(x4god-1)/x5 , posit(1)+posit(3)*(x4god-1)/x5] , [posit(2) , posit(2)+posit(4)] , 'LineStyle' , '--');
