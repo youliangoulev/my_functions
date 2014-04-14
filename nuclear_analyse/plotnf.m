@@ -1,4 +1,4 @@
-function plotnf( time , a , bornes_before , timelimite , smsp )
+function plotnf( time , a , bornes_before , timelimite , smsp)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -29,7 +29,7 @@ n=ii;
 
 for i=1:n
     for j=1:length(w{i})
-        if (w{i}(j)==0)&&(j>1)      
+        if (w{i}(j)<=0)&&(j>1)      
             w{i}(j)=w{i}(j-1); 
         end;
     end;
@@ -69,7 +69,8 @@ for i=1:length(t)
     stdew=[stdew , std(zwr{i})/sqrt(length(zwr{i}))];
 
 end;
-
+ tempra=smooth(meanw , smsp);
+ %%%  aut=tempra; si out
 
    
 if fiting==1   
@@ -77,7 +78,8 @@ if fiting==1
  
    x1=1;
  x5=length(t);
- [y3 , x3]=max(smooth(meanw , smsp));
+
+ [y3 , x3]=max(tempra(2:end-1));
  xvar1=2:x3-1;
  xvar2=x3+1:x5-1;
  x2=[];
@@ -163,7 +165,7 @@ zt1=zt((zt>=t(x1))&(zt<=t(i)));
 fii=figure;
 set(fii,'Position',[251 , 451 , 679 , 346]);
 errorbar(t , smooth(meanw , smsp) , stdew);
-
+if ranksum(zwr{x2god} , zwr{x3}) <= 0.05
 hold on;
 plot(t(x1:x2god) , a1*t(x1:x2god)+b1 , 'color' , 'r' , 'LineWidth',2);
 hold on;
@@ -173,7 +175,15 @@ plot(t(x3:x4god) , a3*t(x3:x4god)+b3 , 'color' , 'r' , 'LineWidth',2);
 hold on;
 plot(t(x4god:x5) , a4*t(x4god:x5)+b4 , 'color' , 'r' , 'LineWidth',2);
 hold on;
-
+else
+    
+    
+             prob3=polyfit(zt , zw , 1);
+        a3=prob3(1);
+        b3=prob3(2);
+        hold on;
+        plot(t(x1:x5) , a3*t(x1:x5)+b3 , 'color' , 'r' , 'LineWidth',2);
+end;
 
 set(gca,'XTick',t(x1):100:t(x5));
 set(gca,'YTick',0:0.2:2);
@@ -254,6 +264,8 @@ xlabel('Time (min)');
 ylabel('Yap1 nuclear enrichment');
 title('Yap1 activity');
 end;
+
+
 
 
 end
