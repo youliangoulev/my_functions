@@ -6,11 +6,11 @@ function [ celltime , cellnenrfluo , celltfluo , cellvolume] = nucfluointensity(
 
 %============================================
 
-filter=1; % 0 = no filter  ||  1 = filter
+filter=0; % 0 = no filter  ||  1 = filter
 
 bgd=700; % backgrownd level (700: 730 en general)
 difcyt=1; % cyt fluorescence ratio cut (cf. the estimation of this at the end of the function)
-inc=0.01;  % 0.1; % increasing backgrownd level per frame (reasonnably 0.1:0.3)
+inc=0.01;   % increasing backgrownd level per frame (reasonnably 0.01:0.3)
 supata=1;
 %============================================
 
@@ -165,7 +165,7 @@ if tot<0
 end;
 
              calcoef( i , n , j , nt);
-             nucenr=(nuc-cyt*difcyt)/(tot); % difcyt
+             nucenr=(nuc-cyt*difcyt); %/(tot); % difcyt
          else
              nuc=0;
              nucarea=0;
@@ -785,11 +785,10 @@ disp(['eliminated errors : ' , num2str(eler)]);
 
 
 
-
+if maxier>0
 disp(['ratio eliminated errors / maximum errors : ' , num2str(eler/maxier)]);
-else
-    
-    
+else   
+end;
 disp(['maximum good data : ' , num2str(maxgd)]);
 disp(['conserved good data : ' , num2str(keegd)]);
 disp(['ratio conserved good data / maximum good data : ' , num2str(keegd/maxgd)]);
