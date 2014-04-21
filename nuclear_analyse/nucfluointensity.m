@@ -17,7 +17,7 @@ supata=1;
 
 global segmentation;
 global dif;
-
+dif=[];
 disp(' ');
 prob=false;
 cha=chanelfluo;
@@ -163,8 +163,9 @@ if tot<0
     prob=true;
     disp(['attention !!! cell ' , num2str(i) , ' not present or negative fluorescence at frame ' , num2str(segmentation.tcells1(i).Obj(j).image)]);
 end;
-
+    
              calcoef( i , n , j , nt);
+
              nucenr=(nuc-cyt*difcyt)/(tot); % difcyt
          else
              nuc=0;
@@ -185,7 +186,9 @@ tot=((segmentation.tcells1(i).Obj(j).fluoMean(cha)-bgd-((segmentation.tcells1(i)
              nt=time-segmentation.tnucleus(n).detectionFrame+1;
              nucx=segmentation.tnucleus(n).Obj(nt).fluoMean(cha)-bgd-((segmentation.tnucleus(n).Obj(nt).image)^supata)*inc;  %%%
              nucareax=segmentation.tnucleus(n).Obj(nt).area;
+   
              calcoef( i , n , j , nt);
+
          else
              nucx=0;
              nucareax=0;
@@ -196,7 +199,11 @@ tot=((segmentation.tcells1(i).Obj(j).fluoMean(cha)-bgd-((segmentation.tcells1(i)
              nt=time-segmentation.tnucleus(n).detectionFrame+1;
              nucy=segmentation.tnucleus(n).Obj(nt).fluoMean(cha)-bgd-((segmentation.tnucleus(n).Obj(nt).image)^supata)*inc;  %%%
              nucareay=segmentation.tnucleus(n).Obj(nt).area;
+            
+  
+             
              calcoef( doublets{ii}(j) , n , j-diff , nt);
+         
          else
              nucy=0;
              nucareay=0;
@@ -287,6 +294,7 @@ disp(['difcyt moyen : ' , num2str(mean(dif)) , '| ecartype : ' , num2str(std(dif
 
 disp(' ');
 
+
 end
 
 
@@ -306,6 +314,7 @@ function calcoef(celln , nucle , framec , framen)
 
 global segmentation;
 global dif;
+global qna;
 
 x1=segmentation.tcells1(celln).Obj(framec).ox;
 x2=segmentation.tnucleus(nucle).Obj(framen).ox;
@@ -314,18 +323,26 @@ y2=segmentation.tnucleus(nucle).Obj(framen).oy;
 Sn=segmentation.tnucleus(nucle).Obj(framen).area;
 Sc=segmentation.tcells1(celln).Obj(framec).area;
 d=sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
+if Sc>Sn*5;
 if sqrt(Sc/pi)<d+sqrt(Sn/pi)
     R=d+sqrt(Sn/pi);
     Vconus=2*Sn*sqrt(R*R-d*d);
     Vdiffe=Vconus-4*sqrt(Sn*Sn*Sn/pi)/3;
     Idiffe=Vdiffe/Sn;
-    Imoyen=4*sqrt(Sc/pi)/3;
+    Imoyen=((4*sqrt(Sc*Sc*Sc/pi)/3) - Vconus)/(Sc-Sn);                    %4*sqrt(Sc/pi)/3;
     dif=[dif , Idiffe/Imoyen];
+    qna=[qna , d];
 
 else
-dif=[dif , ((3*sqrt(1-pi*d*d/Sc))/2)-sqrt(Sn/Sc)];
+R=sqrt(Sc/pi);
+    Vconus=2*Sn*sqrt(R*R-d*d);
+    Vdiffe=Vconus-4*sqrt(Sn*Sn*Sn/pi)/3;
+    Idiffe=Vdiffe/Sn;
+    Imoyen=((4*sqrt(Sc*Sc*Sc/pi)/3) - Vconus)/(Sc-Sn);                    %4*sqrt(Sc/pi)/3;
+    dif=[dif , Idiffe/Imoyen];
+    qna=[qna , d];
 end;
-
+end;
 
 end
 

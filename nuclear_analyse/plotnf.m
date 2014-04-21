@@ -1,11 +1,11 @@
-function plotnf( time , a , bornes_before , timelimite , smsp)
+function plotnf( time , a , bornes_after ,  bornes_before , timelimite , smsp)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
 
 %================================
 
-fiting=1;
+fiting=0;
 
 %================================
 
@@ -14,7 +14,7 @@ w={};
 
 b=[];
 for i=1:length(time)
-    if (time{i}(1)<bornes_before)&&(a{i}(1)>0)
+    if (time{i}(1)<bornes_before)&&(a{i}(1)>0)&&(time{i}(1)>=bornes_after)
         b=[b , i];
     end;
 end;
