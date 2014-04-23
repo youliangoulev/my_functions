@@ -1,4 +1,4 @@
-function [] = fingrmeasure
+function [a] = fingrmeasure
 % calcule du growth rate en fonction du time
 
 % basé sur les differnces dans l'air d'une sous-population entre j et j-1
@@ -116,7 +116,7 @@ high_mmb=min(m_mb)-log(1-filter_area_bud)/lambdammb;
 
 
 
-%% time organisation of the cells an buds
+%% time organisation of the cells and buds
 
 % determination of the time-lapse duration
 maxtime=0;
@@ -174,19 +174,92 @@ end;
 % close waitbar
 close(hwbar);
 drawnow;
-  
-
-
-
 %% calcule of the differences in the time
-
-
-
-
-
-
-
-
+% initialisation for delta
+for i=1:maxtime-1
+delta{i}=[];   
+end;
+% waitbar during second filter building
+daljina=maxtime-1;  
+compt=1;
+hwbar=waitbar(0 , 'delta estimation');
+% delta calculation
+for i=1:maxtime-1
+ if (~isempty(celtnumber{i}))&&(~isempty(celtnumber{i+1}))     
+     for j=1:length(celtnumber{i})
+         if sum(celtnumber{i+1}==celtnumber{i}(j))
+             j1=celtnumber{i+1}==celtnumber{i}(j);
+             if budtnumber{i+1}(j1)==0 
+                 cid=celtnumber{i}(j);
+                 cfr=celtframe{i}(j);
+                 surface1=segmentation.tcells1(cid).Obj(cfr).area;
+                 volum1=4*sqrt(surface1*surface1*surface1/pi)/3;
+                 surface2=segmentation.tcells1(cid).Obj(cfr+1).area;
+                 volum2=4*sqrt(surface2*surface2*surface2/pi)/3; 
+                 diff1=volum2-volum1;
+                 if (diff1>=low_be)&&(diff1<=high_be)
+                     delta{i}=[delta{i} , diff1];
+                 end;
+             else
+                 if budtnumber{i+1}(j1)==budtnumber{i}(j)
+                     cid=celtnumber{i}(j);
+                     cfr=celtframe{i}(j);
+                     surface1=segmentation.tcells1(cid).Obj(cfr).area;
+                     volum1=4*sqrt(surface1*surface1*surface1/pi)/3;
+                     surface2=segmentation.tcells1(cid).Obj(cfr+1).area;
+                     volum2=4*sqrt(surface2*surface2*surface2/pi)/3; 
+                     diff1=volum2-volum1;
+                     bid=budtnumber{i}(j);
+                     bfr=budtframe{i}(j);
+                     surface3=segmentation.tcells1(bid).Obj(bfr).area;
+                     volum3=4*sqrt(surface3*surface3*surface3/pi)/3;
+                     surface4=segmentation.tcells1(bid).Obj(bfr+1).area;
+                     volum4=4*sqrt(surface4*surface4*surface4/pi)/3;
+                     diff2=volum4-volum3;
+                     if (diff1>=low_be)&&(diff1<=high_be)&&(diff2>=low_db)&&(diff2<=high_db)
+                         delta{i}=[delta{i} , diff1+diff2];
+                     end;
+                 else
+                     cid=celtnumber{i}(j);
+                     cfr=celtframe{i}(j);
+                     surface1=segmentation.tcells1(cid).Obj(cfr).area;
+                     volum1=4*sqrt(surface1*surface1*surface1/pi)/3;
+                     surface2=segmentation.tcells1(cid).Obj(cfr+1).area;
+                     volum2=4*sqrt(surface2*surface2*surface2/pi)/3;
+                     bid=budtnumber{i+1}(j1);
+                     bfr=budtframe{i+1}(j1);
+                     surface3=segmentation.tcells1(bid).Obj(bfr).area;
+                     volum3=4*sqrt(surface3*surface3*surface3/pi)/3;
+                     diff1=volum2-volum1;
+                     if (diff1>=low_be)&&(diff1<=high_be)
+                         if volum3<=high_mmb
+                             delta{i}=[delta{i} , diff1+volum3];
+                         end;
+                     else
+                         if (diff1<low_be)&&(diff1<=0)
+                            surface4=surface1-surface2;
+                            volum4=4*sqrt(surface4*surface4*surface4/pi)/3;
+                            diff2=volum3-volum4;
+                            if (diff2>=low_db)&&(diff2<=high_db)
+                                delta{i}=[delta{i} , diff2];
+                            end;
+                         end;
+                     end;
+                 end;
+             end;
+         end;    
+     end;
+ end;
+     % waitbar updating
+    if i>=compt*daljina/20
+        compt=compt+1;
+        waitbar(i/daljina, hwbar);
+    end;
+end;
+% close waitbar
+close(hwbar);
+drawnow;
+a=delta;                              % essayer d'inactiver differents des derniers modules   et ajouter area pour pouvoir diviser comme avec le n
 %% tests
 % ind=[];
 % jdc=[];
