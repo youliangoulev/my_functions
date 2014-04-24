@@ -1,4 +1,4 @@
-function [a , b ] = fingrmeasure
+function [selfo , selfdeltao , mothero , motherdeltao , childo , childeltao ] = fingrmeasure
 % calcule du growth rate en fonction du time
 
 % basé sur les differnces dans l'air d'une sous-population entre j et j-1
@@ -177,6 +177,13 @@ drawnow;
 %% calcule of the differences in the time
 % initialisation for delta
 for i=1:maxtime-1
+selfsize{i}=[];
+selfdelta{i}=[]; 
+childsize{i}=[]; 
+childelta{i}=[]; 
+mothersize{i}=[]; 
+motherchildsize{i}=[]; 
+motherchildelta{i}=[]; 
 deltac{i}=[];  
 deltab{i}=[];  
 end;
@@ -198,9 +205,12 @@ for i=1:maxtime-1
              surface2=segmentation.tcells1(cid).Obj(cfr+1).area;
              volum2=4*sqrt(surface2*surface2*surface2/pi)/3; 
              diff1=volum2-volum1;
-             if (diff1>=low_be)&&(diff1<=high_be)&&(segmentation.tcells1(cid).birthFrame>0 ) &&(i>=segmentation.tcells1(cid).birthFrame) 
-                 deltac{i}=[deltac{i} , diff1];
-             end;             
+
+             if (diff1>=low_be)&&(diff1<=high_be) &&(segmentation.tcells1(cid).birthFrame>0 ) % &&(i>=segmentation.tcells1(cid).birthFrame)
+                 selfsize{i}=[selfsize{i} , volum1];
+                 selfdelta{i}=[selfdelta{i} , diff1];
+             end;   
+
              if budtnumber{i+1}(j1)>0
                  if budtnumber{i+1}(j1)==budtnumber{i}(j)
                      bid=budtnumber{i}(j);
@@ -211,7 +221,10 @@ for i=1:maxtime-1
                      volum4=4*sqrt(surface4*surface4*surface4/pi)/3;
                      diff2=volum4-volum3;
                      if (diff1>=low_be)&&(diff1<=high_be)&&(diff2>=low_db)&&(diff2<=high_db)
-                         deltab{i}=[deltab{i} , diff2 ] ; % diff1+diff2];
+                         mothersize{i}=[mothersize{i} , volum1];
+                         childsize{i}=[childsize{i} , volum3];  
+                         motherdelta{i}=[motherdelta{i} , diff1 ];
+                         childelta{i}=[childelta{i} , diff2 ] ; 
                      end;
                  else
                      bid=budtnumber{i+1}(j1);
@@ -220,7 +233,10 @@ for i=1:maxtime-1
                      volum3=4*sqrt(surface3*surface3*surface3/pi)/3;
                      if (diff1>=low_be)&&(diff1<=high_be)
                          if volum3<=high_mmb
-                             deltab{i}=[deltab{i} , volum3 ] ; % diff1+volum3];
+                             mothersize{i}=[mothersize{i} , volum1];
+                             childsize{i}=[childsize{i} ,            0   ];  
+                             motherdelta{i}=[motherdelta{i} , diff1 ];
+                             childelta{i}=[childelta{i} , volum3 ] ; 
                          end;
                      else
                          if (diff1<low_be)&&(diff1<=0)
@@ -228,7 +244,10 @@ for i=1:maxtime-1
                             volum4=4*sqrt(surface4*surface4*surface4/pi)/3;
                             diff2=volum3-volum4;
                             if (diff2>=low_db)&&(diff2<=high_db)
-                                deltab{i}=[deltab{i} , diff2];
+                                mothersize{i}=[mothersize{i} , volum1];
+                                childsize{i}=[childsize{i} , volum4];  
+                                motherdelta{i}=[motherdelta{i} , diff1 ];
+                                childelta{i}=[childelta{i} , diff2 ] ; 
                             end;
                          end;
                      end;
@@ -246,6 +265,12 @@ end;
 % close waitbar
 close(hwbar);
 drawnow;
+selfo=selfsize;
+selfdeltao=selfdelta;
+mothero=mothersize;
+motherdeltao=motherdelta;
+childo=childsize;
+childeltao=childelta;
 figure;
 ax=1:length(deltac);
 mec=[];
@@ -256,67 +281,13 @@ for i=ax
 mec=[mec , mean(deltac{i})];
 meb=[meb , mean(deltab{i})];
 emece=[emece , std(deltac{i})/sqrt(length(deltac{i}))];
-emebe=[emebe , std(deltab{i})/sqrt(length(deltac{i}))];
+emebe=[emebe , std(deltab{i})/sqrt(length(deltab{i}))];
 end;
 errorbar(ax , smooth(mec , 5) , emece);
 figure;
 errorbar(ax , smooth(meb , 5) , emebe);
 a=deltac; 
 b=deltab; % essayer d'inactiver differents des derniers modules   et ajouter area pour pouvoir diviser comme avec le n
-%% tests
-% ind=[];
-% jdc=[];
-% 
-% ind2=[];
-% jdc2=[];
-% w=0;
-% for i=1:length(segmentation.tcells1)
-%     
-%     if ~isempty(segmentation.tcells1(i).budTimes)
-%         for j=1:length(segmentation.tcells1(i).budTimes)
-%             if segmentation.tcells1(i).budTimes(j)>segmentation.tcells1(i).detectionFrame
-%                 frm=segmentation.tcells1(i).budTimes(j)-segmentation.tcells1(i).detectionFrame+1;
-%                 % calcule of the areabud (j) 
-%                 surface3=segmentation.tcells1(segmentation.tcells1(i).daughterList(j)).Obj(1).area;
-%                 volum3=4*sqrt(surface3*surface3*surface3/pi)/3;
-%                 surface2=segmentation.tcells1(i).Obj(frm).area;
-%                 volum2=4*sqrt(surface2*surface2*surface2/pi)/3;
-%                 surface1=segmentation.tcells1(i).Obj(frm-1).area;
-%                 volum1=4*sqrt(surface1*surface1*surface1/pi)/3;
-%                 
-%                 
-%                 diff1=volum2-volum1;
-%                 if (diff1>=low_be)&&(diff1<=high_be)       
-%                     if volum3>high_mmb
-%                         ind=[ind , i];
-%                         jdc=[jdc , frm];
-%                     end;
-%                 else
-%                     if (diff1<low_be)&&(diff1<0)
-% 
-%                         surface4=surface1-surface2;
-%                         volum4=4*sqrt(surface4*surface4*surface4/pi)/3;
-%                         diff2=volum3-volum4
-%                         if (diff2<low_db)||(diff2>high_db) 
-% 
-%                                                     w=w+1;
-%                         ind2=[ind2 , i];
-%                         jdc2=[jdc2 , frm];
-%                         end;
-%                         
-%                     end;
-%                 end;
-%             end;
-%         end;
-%     end;
-%     
-% 
-%     
-% end;
-% high_db
-% length(m_mb)
-% a=ind2;
-% b=jdc2;
 
 
 
