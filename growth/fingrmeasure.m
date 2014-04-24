@@ -1,4 +1,4 @@
-function [selfo , selfdeltao , mothero , motherdeltao , childo , childeltao ] = fingrmeasure
+function [selfo , selfdeltao , mothero , motherdeltao , childo , childeltao , motherchildo , motherchildeltao] = fingrmeasure
 % calcule du growth rate en fonction du time
 
 % basé sur les differnces dans l'air d'une sous-population entre j et j-1
@@ -181,11 +181,10 @@ selfsize{i}=[];
 selfdelta{i}=[]; 
 childsize{i}=[]; 
 childelta{i}=[]; 
-mothersize{i}=[]; 
+mothersize{i}=[];
+motherdelta{i}=[];
 motherchildsize{i}=[]; 
-motherchildelta{i}=[]; 
-deltac{i}=[];  
-deltab{i}=[];  
+motherchildelta{i}=[];  
 end;
 % waitbar during second filter building
 daljina=maxtime-1;  
@@ -225,32 +224,39 @@ for i=1:maxtime-1
                          childsize{i}=[childsize{i} , volum3];  
                          motherdelta{i}=[motherdelta{i} , diff1 ];
                          childelta{i}=[childelta{i} , diff2 ] ; 
+                         motherchildsize{i}=[motherchildsize{i} , volum1+volum3];
+                         motherchildelta{i}=[motherchildelta{i} , diff1+diff2 ];
                      end;
                  else
                      bid=budtnumber{i+1}(j1);
                      bfr=budtframe{i+1}(j1);
                      surface3=segmentation.tcells1(bid).Obj(bfr).area;
                      volum3=4*sqrt(surface3*surface3*surface3/pi)/3;
-                     if (diff1>=low_be)&&(diff1<=high_be)
-                         if volum3<=high_mmb
-                             mothersize{i}=[mothersize{i} , volum1];
-                             childsize{i}=[childsize{i} ,            0   ];  
-                             motherdelta{i}=[motherdelta{i} , diff1 ];
-                             childelta{i}=[childelta{i} , volum3 ] ; 
-                         end;
-                     else
+%  a faire si seuil de taille de detecton << croissance par frame 
+%                      if (diff1>=low_be)&&(diff1<=high_be)
+%                          if volum3<=high_mmb
+%                              mothersize{i}=[mothersize{i} , volum1];
+%                              childsize{i}=[childsize{i} ,            0   ];  
+%                              motherdelta{i}=[motherdelta{i} , diff1 ];
+%                              childelta{i}=[childelta{i} , volum3 ] ; 
+%                              motherchildsize{i}=[motherchildsize{i} , volum1];
+%                              motherchildelta{i}=[motherchildelta{i} , diff1+volum3 ];
+%                          end;
+%                      else
                          if (diff1<low_be)&&(diff1<=0)
                             surface4=surface1-surface2;
                             volum4=4*sqrt(surface4*surface4*surface4/pi)/3;
                             diff2=volum3-volum4;
                             if (diff2>=low_db)&&(diff2<=high_db)
-                                mothersize{i}=[mothersize{i} , volum1];
+                                mothersize{i}=[mothersize{i} , volum2];
                                 childsize{i}=[childsize{i} , volum4];  
-                                motherdelta{i}=[motherdelta{i} , diff1 ];
-                                childelta{i}=[childelta{i} , diff2 ] ; 
+                                motherdelta{i}=[motherdelta{i} , 0 ];
+                                childelta{i}=[childelta{i} , diff2 ] ;
+                                motherchildsize{i}=[motherchildsize{i} , volum2+volum4];
+                                motherchildelta{i}=[motherchildelta{i} , diff2 ];
                             end;
                          end;
-                     end;
+                     % end;
                  end;
              end;
          end;    
@@ -271,25 +277,7 @@ mothero=mothersize;
 motherdeltao=motherdelta;
 childo=childsize;
 childeltao=childelta;
-figure;
-ax=1:length(deltac);
-mec=[];
-meb=[];
-emece=[];
-emebe=[];
-for i=ax
-mec=[mec , mean(deltac{i})];
-meb=[meb , mean(deltab{i})];
-emece=[emece , std(deltac{i})/sqrt(length(deltac{i}))];
-emebe=[emebe , std(deltab{i})/sqrt(length(deltab{i}))];
-end;
-errorbar(ax , smooth(mec , 5) , emece);
-figure;
-errorbar(ax , smooth(meb , 5) , emebe);
-a=deltac; 
-b=deltab; % essayer d'inactiver differents des derniers modules   et ajouter area pour pouvoir diviser comme avec le n
-
-
-
+motherchildo=motherchildsize;
+motherchildeltao=motherchildelta;
 end
 

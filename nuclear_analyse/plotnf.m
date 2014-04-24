@@ -5,7 +5,7 @@ function plotnf( time , a , bornes_after ,  bornes_before , timelimite , smsp)
 
 %================================
 
-fiting=0;
+fiting=1;
 
 %================================
 
