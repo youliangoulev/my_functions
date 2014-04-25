@@ -21,7 +21,9 @@ end;
 meandelta=[];
 errordelta=[];
 meansize=[];
+grpersiz=[]; 
 errorsize=[];
+errorgrpersiz=[];
 num=[];
 for i=1:length(delta)
     meandelta=[meandelta , mean(delta{i})];
@@ -29,6 +31,8 @@ for i=1:length(delta)
     errordelta=[errordelta , std(delta{i})/sqrt(length(delta{i}))];
     errorsize=[errorsize , std(size{i})/sqrt(length(size{i}))];
     num=[num , length(size{i})];
+    grpersiz=[grpersiz , sum(delta{i})/sum(size{i})];
+    errorgrpersiz=[errorgrpersiz , sqrt((length(delta{i})*std(delta{i})*std(delta{i})/sum(size{i})^2)+((sum(delta{i})^2)*length(delta{i})*std(size{i})*std(size{i})/sum(size{i})^4))];
 end;
 figure;
 errorbar(xax , smooth(meandelta , sms) , errordelta);
@@ -42,8 +46,16 @@ figure;
 plot(xax , smooth(meansize , sms));
 set(gca,'FontSize',20)
 xlabel('Time (min)');
-ylabel('Mean area per cell (au)');
+ylabel('Mean volum per cell (au)');
 title('Cell area');
+figure;
+errorbar(xax , smooth(grpersiz , sms) , errorgrpersiz);
+hold on;
+plot(xax , smooth(grpersiz , sms) , 'color' , 'r' , 'LineWidth' , 2);
+set(gca,'FontSize',20)
+xlabel('Time (min)');
+ylabel('Mean growth rate per unit of volum (min-1)');
+title('Growth rate per volum'); 
 figure;
 plot(xax , num , 'LineStyle' , 'none' , 'MarkerSize', 6 , 'MarkerEdgeColor','k' , 'MarkerFaceColor','g' , 'Marker' , 's');
 set(gca,'FontSize',20)
@@ -53,7 +65,7 @@ title('Statistical significance');
 figure ;
 scatter (za , zd) ;
 set(gca,'FontSize',20)
-xlabel('Cell area (au)');
+xlabel('Cell volum (au)');
 ylabel('Cell growth rate (au)');
 title('Cell area and growth rate correlation');
 stop1=false;

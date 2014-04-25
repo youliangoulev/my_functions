@@ -287,7 +287,7 @@ for i=axgen
     meangrgen(i)=mean(grgen(i==generation));
     errorgrgen(i)=std(grgen(i==generation))/sqrt(sum(i==generation));
 end;
-errorbar(axgen , meangrgen , errorgrgen );
+errorbar(axgen , meangrgen , errorgrgen ,'LineStyle' , 'none' , 'MarkerSize', 6 , 'MarkerEdgeColor','k' , 'MarkerFaceColor','g' , 'Marker' , 's' , 'color' , 'k');
  set(gca,'FontSize',20)
         xlabel('Generation');
         ylabel('Mean cell growth (au)');
