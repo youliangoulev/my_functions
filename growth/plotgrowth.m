@@ -22,14 +22,18 @@ meandelta=[];
 errordelta=[];
 meansize=[];
 errorsize=[];
+num=[];
 for i=1:length(delta)
     meandelta=[meandelta , mean(delta{i})];
     meansize=[meansize , mean(size{i})];
     errordelta=[errordelta , std(delta{i})/sqrt(length(delta{i}))];
     errorsize=[errorsize , std(size{i})/sqrt(length(size{i}))];
+    num=[num , length(size{i})];
 end;
 figure;
-plot(xax , smooth(meandelta , sms));
+errorbar(xax , smooth(meandelta , sms) , errordelta);
+hold on;
+plot(xax , smooth(meandelta , sms) , 'color' , 'r' , 'LineWidth' , 2);
 set(gca,'FontSize',20)
 xlabel('Time (min)');
 ylabel('Mean growth rate per cell (au)');
@@ -39,7 +43,13 @@ plot(xax , smooth(meansize , sms));
 set(gca,'FontSize',20)
 xlabel('Time (min)');
 ylabel('Mean area per cell (au)');
-title('Cell area'); 
+title('Cell area');
+figure;
+plot(xax , num , 'LineStyle' , 'none' , 'MarkerSize', 6 , 'MarkerEdgeColor','k' , 'MarkerFaceColor','g' , 'Marker' , 's');
+set(gca,'FontSize',20)
+xlabel('Time (min)');
+ylabel('Number of analysed events');
+title('Statistical significance');
 figure ;
 scatter (za , zd) ;
 set(gca,'FontSize',20)

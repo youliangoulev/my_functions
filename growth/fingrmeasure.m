@@ -186,6 +186,8 @@ motherdelta{i}=[];
 motherchildsize{i}=[]; 
 motherchildelta{i}=[];  
 end;
+generation=[];
+grgen=[];
 % waitbar during second filter building
 daljina=maxtime-1;  
 compt=1;
@@ -226,6 +228,10 @@ for i=1:maxtime-1
                          childelta{i}=[childelta{i} , diff2 ] ; 
                          motherchildsize{i}=[motherchildsize{i} , volum1+volum3];
                          motherchildelta{i}=[motherchildelta{i} , diff1+diff2 ];
+                         if (segmentation.tcells1(cid).birthFrame>0 )
+                             generation=[generation , find(segmentation.tcells1(cid).daughterList==bid)];
+                             grgen=[grgen , diff1 + diff2];
+                         end;
                      end;
                  else
                      bid=budtnumber{i+1}(j1);
@@ -254,6 +260,10 @@ for i=1:maxtime-1
                                 childelta{i}=[childelta{i} , diff2 ] ;
                                 motherchildsize{i}=[motherchildsize{i} , volum2+volum4];
                                 motherchildelta{i}=[motherchildelta{i} , diff2 ];
+                                if (segmentation.tcells1(cid).birthFrame>0 )
+                                    generation=[generation , find(segmentation.tcells1(cid).daughterList==bid)];
+                                    grgen=[grgen , diff2];
+                                end;
                             end;
                          end;
                      % end;
@@ -271,6 +281,18 @@ end;
 % close waitbar
 close(hwbar);
 drawnow;
+figure;
+axgen=1:max(generation);
+for i=axgen
+    meangrgen(i)=mean(grgen(i==generation));
+    errorgrgen(i)=std(grgen(i==generation))/sqrt(sum(i==generation));
+end;
+errorbar(axgen , meangrgen , errorgrgen );
+ set(gca,'FontSize',20)
+        xlabel('Generation');
+        ylabel('Mean cell growth (au)');
+        title('Cell growth during aging');
+%% out
 selfo=selfsize;
 selfdeltao=selfdelta;
 mothero=mothersize;
