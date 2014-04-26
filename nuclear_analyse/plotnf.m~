@@ -257,18 +257,11 @@ for i=1:ii
             qqg=[qqg , smooth(w{i}(x2god+1:x3) , smsp)'];
             if length(tim{i})>=x4god
                 qqg=[qqg , smooth(w{i}(x3+1:x4god) , smsp)'];
-                if length(tim{i})>x4god
-                    qqg=[qqg , smooth(w{i}(x4god+1:end) , smsp)'];
-                end;                    
             else
-                if length(tim{i})>x3
                 qqg=[qqg , smooth(w{i}(x3+1:end) , smsp)'];
-                end;
             end;
         else
-            if length(tim{i})>x2god
             qqg=[qqg , smooth(w{i}(x2god+1:end) , smsp)'];
-            end;
         end;
     else
         qqg=[qqg , smooth(w{i} , smsp)'];

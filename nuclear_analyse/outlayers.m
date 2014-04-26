@@ -9,7 +9,7 @@ celimitn=300; % min number of events to be scored (window of time)
 alpha=0.05; % p-value for testing mean and std between windows of min number of events
 certitudegoods=0.1; % tolerated relative error for estimation of the good events
 
-binseuil=0.0011; %   0.002 for 60x obj   ||   0.011 for 100x obj
+binseuil=0.0011; %   0.002 for 60x obj   ||   0.011 for 100x obj   et 0.0011
 ratior=2; %   1000 for 60x obj   ||   2 for 100x obj
 
 %$$$$$$$$$$$$$$$$$$$$$$$$$
