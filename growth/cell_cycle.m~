@@ -27,7 +27,7 @@ end;
 %% cel selection
 goodcel=[];
 for i=1:length(segmentation.tcells1)
-    if (length(segmentation.tcells1(i).daughterList)>1)&&(segmentation.tcells1(i).divisionTimes(1)<stress)
+    if (length(segmentation.tcells1(i).daughterList)>1)&&(segmentation.tcells1(i).divisionTimes(1)<stress)&&(segmentation.tcells1(i).divisionTimes(2)<=segmentation.tcells1(i).Obj(celobj(i)).image)
         goodcel=[goodcel , i];
     end;
 end;

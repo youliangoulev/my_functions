@@ -10,7 +10,7 @@ function [selfo , selfdeltao , mothero , motherdeltao , childo , childeltao , mo
 
 
 %% declarations & constantes
-poststress=201;
+
 
 global segmentation;
 filter_area_diff=1.5; % 1.5 ~ 2.7 sigma ~ 99.3 %
@@ -297,7 +297,7 @@ errorbar(axgen , meangrgen , errorgrgen ,'LineStyle' , 'none' , 'MarkerSize', 6 
         ylabel('Mean cell growth (au)');
         title('Cell growth during aging');
 figure;
-scatter(vreme , vrmgen);
+scatter(vreme , grgen);
  set(gca,'FontSize',20)
         xlabel('Birth time');
         ylabel('Cell growth (au)');
