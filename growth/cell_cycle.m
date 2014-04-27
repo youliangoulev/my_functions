@@ -1,3 +1,42 @@
+function [ output_args ] = cell_cycle( stresstiming , resolution , chanelfluo )
+%UNTITLED Summary of this function goes here
+%   Detailed explanation goes here
+
+%% declaration
+framet=3;
+filter=1;
+global segmentation;
+cha=chanelfluo;
+stress=round(stresstiming/framet)+1;
+%% cel duration estimation
+if filter
+    celobj=outlayers(resolution , cha);
+else
+
+cellengtha=[];
+for i=1:length(segmentation.tcells1)   
+    if segmentation.tcells1(i).N>0
+    cellengtha=[cellengtha , length(segmentation.tcells1(i).Obj)];
+    else
+    cellengtha=[cellengtha , 0];
+    end;
+end;
+
+     celobj=cellengtha;
+end;
+%% cel selection
+goodcel=[];
+for i=1:length(segmentation.tcells1)
+    if (length(segmentation.tcells1(i).daughterList)>1)&&(segmentation.tcells1(i).divisionTimes(1)<stress)
+        goodcel=[goodcel , i];
+    end;
+end;
+%% calcule of the cell cycle durations
+before_cells=[];
+for i=goodcel
+end;
+end
+%% outlayers function
 function [aut]=outlayers(resolution ,chanelfluo)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
@@ -449,4 +488,3 @@ disp(' ');
 aut=cellength;
 
 end
-
