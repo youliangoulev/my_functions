@@ -4,7 +4,7 @@ function [ output_args ] = cell_cycle( stresstiming , resolution , chanelfluo )
 
 %% declaration
 framet=3;
-filter=1;
+filter=0;
 global segmentation;
 cha=chanelfluo;
 stress=round(stresstiming/framet)+1;
@@ -27,14 +27,45 @@ end;
 %% cel selection
 goodcel=[];
 for i=1:length(segmentation.tcells1)
-    if (length(segmentation.tcells1(i).daughterList)>1)&&(segmentation.tcells1(i).divisionTimes(1)<stress)
+    if (length(segmentation.tcells1(i).daughterList)>1)&&(segmentation.tcells1(i).birthFrame<stress)&&(segmentation.tcells1(i).divisionTimes(2)<=segmentation.tcells1(i).Obj(celobj(i)).image)&&(segmentation.tcells1(i).detectionFrame<stress)
         goodcel=[goodcel , i];
     end;
 end;
 %% calcule of the cell cycle durations
-before_cells=[];
+before_mothers1=[];
+before_mlengths=[];
+celid=[];
+budid=[];
+sizmother_before=[];
+sizbud_before=[];
+before_daughters1=[];
+before_dlengths=[];
 for i=goodcel
+    for j=2:length(segmentation.tcells1(i).divisionTimes)
+        if (segmentation.tcells1(i).divisionTimes(j)<stress)&&(segmentation.tcells1(i).divisionTimes(j)<=segmentation.tcells1(i).Obj(celobj(i)).image)
+            before_mothers1=[before_mothers1 , segmentation.tcells1(i).divisionTimes(j-1)];
+            before_mlengths=[before_mlengths , segmentation.tcells1(i).divisionTimes(j)-segmentation.tcells1(i).divisionTimes(j-1) ];
+            frm=segmentation.tcells1(i).divisionTimes(j)-segmentation.tcells1(i).detectionFrame+1;
+            sizmother_before=[sizmother_before , segmentation.tcells1(i).Obj(frm).area];
+            celid=[celid , i];
+        else
+            break;
+        end;
+    end;
 end;
+dd=1:length(before_mothers1);
+inthere=true;
+while inthere
+    inthere=false;
+    for i=dd
+        if before_mothers1(i)+mean(before_mlengths(dd))+3*std(before_mlengths(dd))>stress
+            dd=dd(before_mothers1(dd)<max(before_mothers1(dd)));
+            inthere=true;
+            break;
+        end;
+    end;
+end;
+celid(1);
 end
 %% outlayers function
 function [aut]=outlayers(resolution ,chanelfluo)
