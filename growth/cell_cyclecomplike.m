@@ -1,15 +1,14 @@
-function [ output_args ] = cell_cycle( stresstiming , resolution , chanelfluo )
+function [ output_args ] = cell_cyclecomplike( stresstiming , resolution , chanelfluo )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
 %% declaration
-minimalcycleduration=30;
 framet=3;
-filter=1;
+filter=0;
 global segmentation;
 cha=chanelfluo;
 stress=round(stresstiming/framet)+1;
-divmin=round(minimalcycleduration/framet);
+divmin=10;
 %% cel duration estimation
 if filter
     celobj=outlayers(resolution , cha);
@@ -35,17 +34,21 @@ for i=1:length(segmentation.tcells1)
 end;
 %% calcule of the cell cycle durations
 before_mothers1=[];
-before_duration=[];
-before_celid=[];
-before_sizmother=[];
+before_mlengths=[];
+beforecelid=[];
+beforebudid=[];
+sizmother_before=[];
+sizbud_before=[];
+before_daughters1=[];
+before_dlengths=[];
 for i=goodcel
     for j=2:length(segmentation.tcells1(i).divisionTimes)
-        if (segmentation.tcells1(i).divisionTimes(j)<stress)&&(segmentation.tcells1(i).divisionTimes(j)<=segmentation.tcells1(i).Obj(celobj(i)).image)&&(segmentation.tcells1(i).divisionTimes(j)-segmentation.tcells1(i).divisionTimes(j-1) >= divmin )
+        if (segmentation.tcells1(i).divisionTimes(j)<stress)&&(segmentation.tcells1(i).divisionTimes(j)<=segmentation.tcells1(i).Obj(celobj(i)).image)
             before_mothers1=[before_mothers1 , segmentation.tcells1(i).divisionTimes(j-1)];
-            before_duration=[before_duration , segmentation.tcells1(i).divisionTimes(j)-segmentation.tcells1(i).divisionTimes(j-1) ];
+            before_mlengths=[before_mlengths , segmentation.tcells1(i).divisionTimes(j)-segmentation.tcells1(i).divisionTimes(j-1) ];
             frm=segmentation.tcells1(i).divisionTimes(j)-segmentation.tcells1(i).detectionFrame+1;
-            before_sizmother=[before_sizmother , 4*sqrt(segmentation.tcells1(i).Obj(frm).area*segmentation.tcells1(i).Obj(frm).area*segmentation.tcells1(i).Obj(frm).area/pi)/3];
-            before_celid=[before_celid , i];
+            sizmother_before=[sizmother_before , 4*sqrt(segmentation.tcells1(i).Obj(frm).area*segmentation.tcells1(i).Obj(frm).area*segmentation.tcells1(i).Obj(frm).area/pi)/3];
+            beforecelid=[beforecelid , i];
         else
             break;
         end;
@@ -56,30 +59,50 @@ inthere=true;
 while inthere
     inthere=false;
     for i=dd
-        if before_mothers1(i)+mean(before_duration(dd))+3*std(before_duration(dd))>stress
+        if before_mothers1(i)+mean(before_mlengths(dd))+3*std(before_mlengths(dd))>stress
             dd=dd(before_mothers1(dd)<max(before_mothers1(dd)));
             inthere=true;
             break;
         end;
     end;
 end;
-before_mothers1=before_mothers1(dd);
-before_duration=before_duration(dd);
-divmin=mean(before_duration)-2.7*std(before_duration);
-before_celid=before_celid(dd);
-before_sizmother=before_sizmother(dd);
+for i=1:length(segmentation.tcells1)
+    if (segmentation.tcells1(i).birthFrame>0)&&(~isempty(segmentation.tcells1(i).divisionTimes))&&(segmentation.tcells1(i).divisionTimes(1)<stress)&&(segmentation.tcells1(i).divisionTimes(1)<=segmentation.tcells1(i).Obj(celobj(i)).image)
+        before_daughters1=[before_daughters1 , segmentation.tcells1(i).birthFrame];
+        before_dlengths=[before_dlengths , segmentation.tcells1(i).divisionTimes(1) - segmentation.tcells1(i).birthFrame ];
+        frm=segmentation.tcells1(i).divisionTimes(1)-segmentation.tcells1(i).detectionFrame+1;
+        sizbud_before=[sizbud_before , 4*sqrt(segmentation.tcells1(i).Obj(frm).area*segmentation.tcells1(i).Obj(frm).area*segmentation.tcells1(i).Obj(frm).area/pi)/3];
+        beforebudid=[beforebudid , i];
+    end;
+end;
+bb=1:length(before_daughters1);
+inthere=true;
+while inthere
+    inthere=false;
+    for i=bb
+        if before_daughters1(i)+mean(before_dlengths(bb))+2*std(before_dlengths(bb))>stress
+            bb=bb(before_daughters1(bb)<max(before_daughters1(bb)));
+            inthere=true;
+            break;
+        end;
+    end;
+end;
 during_mothers1=[];
-during_duration=[];
-during_celid=[];
-during_sizmother=[];
+during_mlengths=[];
+duringcelid=[];
+duringbudid=[];
+sizmother_during=[];
+sizbud_during=[];
+during_daughters1=[];
+during_dlengths=[];
 for i=goodcel
     for j=2:length(segmentation.tcells1(i).divisionTimes)
-        if (segmentation.tcells1(i).divisionTimes(j)>stress)&&(segmentation.tcells1(i).divisionTimes(j)<=segmentation.tcells1(i).Obj(celobj(i)).image)&&(segmentation.tcells1(i).divisionTimes(j-1)<stress)&& (segmentation.tcells1(i).divisionTimes(j)-segmentation.tcells1(i).divisionTimes(j-1) >= divmin )
+        if (segmentation.tcells1(i).divisionTimes(j)>stress)&&(segmentation.tcells1(i).divisionTimes(j)<=segmentation.tcells1(i).Obj(celobj(i)).image)&&(segmentation.tcells1(i).divisionTimes(j-1)<stress)
             during_mothers1=[during_mothers1 , segmentation.tcells1(i).divisionTimes(j-1)];
-            during_duration=[during_duration , segmentation.tcells1(i).divisionTimes(j)-segmentation.tcells1(i).divisionTimes(j-1) ];
+            during_mlengths=[during_mlengths , segmentation.tcells1(i).divisionTimes(j)-segmentation.tcells1(i).divisionTimes(j-1) ];
             frm=segmentation.tcells1(i).divisionTimes(j)-segmentation.tcells1(i).detectionFrame+1;
-            during_sizmother=[during_sizmother , 4*sqrt(segmentation.tcells1(i).Obj(frm).area*segmentation.tcells1(i).Obj(frm).area*segmentation.tcells1(i).Obj(frm).area/pi)/3];
-            during_celid=[during_celid , i];
+            sizmother_during=[sizmother_during , 4*sqrt(segmentation.tcells1(i).Obj(frm).area*segmentation.tcells1(i).Obj(frm).area*segmentation.tcells1(i).Obj(frm).area/pi)/3];
+            duringcelid=[duringcelid , i];
         end;
     end;
 end;
@@ -88,42 +111,114 @@ inthere=true;
 while inthere
     inthere=false;
     for i=dd2
-        if during_mothers1(i)+mean(before_duration)-2*std(before_duration)<=stress
+        if during_mothers1(i)+mean(before_mlengths(dd))-2*std(before_mlengths(dd))<=stress
             dd2=dd2(during_mothers1(dd2)>min(during_mothers1(dd2)));
             inthere=true;
             break;
         end;
     end;
 end;
-during_mothers1=during_mothers1(dd2);
-during_duration=during_duration(dd2);
-during_celid=during_celid(dd2);
-during_sizmother=during_sizmother(dd2);
-after_mothers1=[];
-after_duration=[];
-after_celid=[];
-after_sizmother=[];
+for i=1:length(segmentation.tcells1)
+    if (segmentation.tcells1(i).birthFrame>0)&&(~isempty(segmentation.tcells1(i).divisionTimes))&&(segmentation.tcells1(i).divisionTimes(1)>stress)&&(segmentation.tcells1(i).divisionTimes(1)<=segmentation.tcells1(i).Obj(celobj(i)).image)&&(segmentation.tcells1(i).birthFrame<stress)
+        during_daughters1=[during_daughters1 , segmentation.tcells1(i).birthFrame];
+        during_dlengths=[during_dlengths , segmentation.tcells1(i).divisionTimes(1) - segmentation.tcells1(i).birthFrame ];
+        frm=segmentation.tcells1(i).divisionTimes(1)-segmentation.tcells1(i).detectionFrame+1;
+        sizbud_during=[sizbud_during , 4*sqrt(segmentation.tcells1(i).Obj(frm).area*segmentation.tcells1(i).Obj(frm).area*segmentation.tcells1(i).Obj(frm).area/pi)/3];
+        duringbudid=[duringbudid , i];
+    end;
+end;
+bb2=1:length(during_daughters1);
+inthere=true;
+while inthere
+    inthere=false;
+    for i=bb2
+        if during_daughters1(i)+mean(before_dlengths(bb))-2*std(before_dlengths(bb))<=stress
+            bb2=bb2(during_daughters1(bb2)>min(during_daughters1(bb2)));
+            inthere=true;
+            break;
+        end;
+    end;
+end;
+after1_mothers1=[];
+after1_mlengths=[];
+after1celid=[];
+after1budid=[];
+sizmother_after1=[];
+sizbud_after1=[];
+after1_daughters1=[];
+after1_dlengths=[];
+after2_mothers1=[];
+after2_mlengths=[];
+after2celid=[];
+after2budid=[];
+sizmother_after2=[];
+sizbud_after2=[];
+after2_daughters1=[];
+after2_dlengths=[];
+after3_mothers1=[];
+after3_mlengths=[];
+after3celid=[];
+after3budid=[];
+sizmother_after3=[];
+sizbud_after3=[];
+after3_daughters1=[];
+after3_dlengths=[];
 for i=goodcel
     for j=2:length(segmentation.tcells1(i).divisionTimes)
-        if (segmentation.tcells1(i).divisionTimes(j)>stress)&&(segmentation.tcells1(i).divisionTimes(j)<=segmentation.tcells1(i).Obj(celobj(i)).image)&&(segmentation.tcells1(i).divisionTimes(j-1)>stress)
-            if (segmentation.tcells1(i).divisionTimes(j)-segmentation.tcells1(i).divisionTimes(j-1)>=divmin)
-                after_mothers1=[after_mothers1 , segmentation.tcells1(i).divisionTimes(j-1)];
-                after_duration=[after_duration , segmentation.tcells1(i).divisionTimes(j)-segmentation.tcells1(i).divisionTimes(j-1) ];
-                frm=segmentation.tcells1(i).divisionTimes(j)-segmentation.tcells1(i).detectionFrame+1;
-                after_sizmother=[after_sizmother , 4*sqrt(segmentation.tcells1(i).Obj(frm).area*segmentation.tcells1(i).Obj(frm).area*segmentation.tcells1(i).Obj(frm).area/pi)/3];
-                after_celid=[after_celid , i];
+        if (segmentation.tcells1(i).divisionTimes(j)>stress)&&(segmentation.tcells1(i).divisionTimes(j)<=segmentation.tcells1(i).Obj(celobj(i)).image)&&(segmentation.tcells1(i).divisionTimes(j-1)>stress)&&(segmentation.tcells1(i).divisionTimes(j)-segmentation.tcells1(i).divisionTimes(j-1)>divmin)
+            after1_mothers1=[after1_mothers1 , segmentation.tcells1(i).divisionTimes(j-1)];
+            after1_mlengths=[after1_mlengths , segmentation.tcells1(i).divisionTimes(j)-segmentation.tcells1(i).divisionTimes(j-1) ];
+            frm=segmentation.tcells1(i).divisionTimes(j)-segmentation.tcells1(i).detectionFrame+1;
+            sizmother_after1=[sizmother_after1 , 4*sqrt(segmentation.tcells1(i).Obj(frm).area*segmentation.tcells1(i).Obj(frm).area*segmentation.tcells1(i).Obj(frm).area/pi)/3];
+            after1celid=[after1celid , i];
+            if ~isempty(segmentation.tcells1(segmentation.tcells1(i).daughterList(j)).divisionTimes)&&(segmentation.tcells1(segmentation.tcells1(i).daughterList(j)).divisionTimes(1)<=segmentation.tcells1(segmentation.tcells1(i).daughterList(j)).Obj(celobj(segmentation.tcells1(i).daughterList(j))).image)&&(segmentation.tcells1(segmentation.tcells1(i).daughterList(j)).divisionTimes(1) - segmentation.tcells1(segmentation.tcells1(i).daughterList(j)).birthFrame > divmin )
+                after1_daughters1=[after1_daughters1 , segmentation.tcells1(segmentation.tcells1(i).daughterList(j)).birthFrame];
+                after1_dlengths=[after1_dlengths , segmentation.tcells1(segmentation.tcells1(i).daughterList(j)).divisionTimes(1) - segmentation.tcells1(segmentation.tcells1(i).daughterList(j)).birthFrame ];
+                frm=segmentation.tcells1(segmentation.tcells1(i).daughterList(j)).divisionTimes(1)-segmentation.tcells1(segmentation.tcells1(i).daughterList(j)).detectionFrame+1;
+                sizbud_after1=[sizbud_after1 , 4*sqrt(segmentation.tcells1(segmentation.tcells1(i).daughterList(j)).Obj(frm).area*segmentation.tcells1(segmentation.tcells1(i).daughterList(j)).Obj(frm).area*segmentation.tcells1(segmentation.tcells1(i).daughterList(j)).Obj(frm).area/pi)/3];
+                after1budid=[after1budid , segmentation.tcells1(i).daughterList(j)];
+            end;
+            if (length(segmentation.tcells1(i).divisionTimes)>j)&&(segmentation.tcells1(i).divisionTimes(j+1)<=segmentation.tcells1(i).Obj(celobj(i)).image)&&(segmentation.tcells1(i).divisionTimes(j+1)-segmentation.tcells1(i).divisionTimes(j)>divmin)
+                after2_mothers1=[after2_mothers1 , segmentation.tcells1(i).divisionTimes(j)];
+                after2_mlengths=[after2_mlengths , segmentation.tcells1(i).divisionTimes(j+1)-segmentation.tcells1(i).divisionTimes(j) ];
+                frm=segmentation.tcells1(i).divisionTimes(j+1)-segmentation.tcells1(i).detectionFrame+1;
+                sizmother_after2=[sizmother_after2 , 4*sqrt(segmentation.tcells1(i).Obj(frm).area*segmentation.tcells1(i).Obj(frm).area*segmentation.tcells1(i).Obj(frm).area/pi)/3];
+                after2celid=[after2celid , i];
+                if ~isempty(segmentation.tcells1(segmentation.tcells1(i).daughterList(j+1)).divisionTimes)&&(segmentation.tcells1(segmentation.tcells1(i).daughterList(j+1)).divisionTimes(1)<=segmentation.tcells1(segmentation.tcells1(i).daughterList(j+1)).Obj(celobj(segmentation.tcells1(i).daughterList(j+1))).image)&&(segmentation.tcells1(segmentation.tcells1(i).daughterList(j+1)).divisionTimes(1) - segmentation.tcells1(segmentation.tcells1(i).daughterList(j+1)).birthFrame > divmin)
+                    after2_daughters1=[after2_daughters1 , segmentation.tcells1(segmentation.tcells1(i).daughterList(j+1)).birthFrame];
+                    after2_dlengths=[after2_dlengths , segmentation.tcells1(segmentation.tcells1(i).daughterList(j+1)).divisionTimes(1) - segmentation.tcells1(segmentation.tcells1(i).daughterList(j+1)).birthFrame ];
+                    frm=segmentation.tcells1(segmentation.tcells1(i).daughterList(j+1)).divisionTimes(1)-segmentation.tcells1(segmentation.tcells1(i).daughterList(j+1)).detectionFrame+1;
+                    sizbud_after2=[sizbud_after2 , 4*sqrt(segmentation.tcells1(segmentation.tcells1(i).daughterList(j+1)).Obj(frm).area*segmentation.tcells1(segmentation.tcells1(i).daughterList(j+1)).Obj(frm).area*segmentation.tcells1(segmentation.tcells1(i).daughterList(j+1)).Obj(frm).area/pi)/3];
+                    after2budid=[after2budid , segmentation.tcells1(i).daughterList(j+1)];
+                end;
+                    if (length(segmentation.tcells1(i).divisionTimes)>j+1)&&(segmentation.tcells1(i).divisionTimes(j+2)<=segmentation.tcells1(i).Obj(celobj(i)).image)&&(segmentation.tcells1(i).divisionTimes(j+2)-segmentation.tcells1(i).divisionTimes(j+1)>divmin)
+                        after3_mothers1=[after3_mothers1 , segmentation.tcells1(i).divisionTimes(j+1)];
+                        after3_mlengths=[after3_mlengths , segmentation.tcells1(i).divisionTimes(j+2)-segmentation.tcells1(i).divisionTimes(j+1) ];
+                        frm=segmentation.tcells1(i).divisionTimes(j+2)-segmentation.tcells1(i).detectionFrame+1;
+                        sizmother_after3=[sizmother_after3 , 4*sqrt(segmentation.tcells1(i).Obj(frm).area*segmentation.tcells1(i).Obj(frm).area*segmentation.tcells1(i).Obj(frm).area/pi)/3];
+                        after3celid=[after3celid , i];
+                        if ~isempty(segmentation.tcells1(segmentation.tcells1(i).daughterList(j+2)).divisionTimes)&&(segmentation.tcells1(segmentation.tcells1(i).daughterList(j+2)).divisionTimes(1)<=segmentation.tcells1(segmentation.tcells1(i).daughterList(j+2)).Obj(celobj(segmentation.tcells1(i).daughterList(j+2))).image)&&(segmentation.tcells1(segmentation.tcells1(i).daughterList(j+2)).divisionTimes(1) - segmentation.tcells1(segmentation.tcells1(i).daughterList(j+2)).birthFrame>divmin)
+                            after3_daughters1=[after3_daughters1 , segmentation.tcells1(segmentation.tcells1(i).daughterList(j+2)).birthFrame];
+                            after3_dlengths=[after3_dlengths , segmentation.tcells1(segmentation.tcells1(i).daughterList(j+2)).divisionTimes(1) - segmentation.tcells1(segmentation.tcells1(i).daughterList(j+2)).birthFrame ];
+                            frm=segmentation.tcells1(segmentation.tcells1(i).daughterList(j+2)).divisionTimes(1)-segmentation.tcells1(segmentation.tcells1(i).daughterList(j+2)).detectionFrame+1;
+                            sizbud_after3=[sizbud_after3 , 4*sqrt(segmentation.tcells1(segmentation.tcells1(i).daughterList(j+2)).Obj(frm).area*segmentation.tcells1(segmentation.tcells1(i).daughterList(j+2)).Obj(frm).area*segmentation.tcells1(segmentation.tcells1(i).daughterList(j+2)).Obj(frm).area/pi)/3];
+                            after3budid=[after3budid , segmentation.tcells1(i).daughterList(j+2)];
+                        end;
+                    end;
             end;
             break;
         end;
     end;
 end;
-x=0:15*framet:255*framet;
-figure;
-hist(before_duration*framet , x);
-figure;
-hist(during_duration*framet , x);
-figure;
-hist(after_duration*framet , x);
+sca1=[];
+sca2=[];
+for i=1:length(before_mlengths)
+    if sum(after1celid==beforecelid(i))
+        sca1=[sca1 , before_mlengths(i) ];
+        sca2=[sca2 , after1_mlengths(after1celid==beforecelid(i)) ];
+    end;
+end;
+scatter(sca1 , sca2);
 end
 %% outlayers function
 function [aut]=outlayers(resolution ,chanelfluo)
