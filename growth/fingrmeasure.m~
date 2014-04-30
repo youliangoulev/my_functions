@@ -4,6 +4,11 @@ function [sizeout , deltaout , tracking] = fingrmeasure
 % basé sur les differnces dans l'air d'une sous-population entre j et j-1
 % frames . La sous-population peut changer d'un couple de frame à une autre
 % !
+
+
+
+
+
 %% declarations & constantes
 global segmentation;
 filter_area_diff=1.5; % 1.5 ~ 2.7 sigma ~ 99.3 %
@@ -172,7 +177,7 @@ mothersize{i}=[];
 motherdelta{i}=[];
 trackselfid{i}=[];
 trackmotherid{i}=[];
-trackbudid{i}=[];
+trackbud{i}=[];
 trackbirth{i}=[];
 trackgeneration{i}=[];
 motherchildsize{i}=[]; 
@@ -224,7 +229,7 @@ for i=1:maxtime-1
                          childelta{i}=[childelta{i} , diff2 ] ; 
                          motherchildsize{i}=[motherchildsize{i} , volum1+volum3];
                          motherchildelta{i}=[motherchildelta{i} , diff1+diff2 ];
-                         trackmotherid{i}=[trackmotherid{i} , cid];
+                         trackmotherid{i}=[trackmother{i} , cid];
                          trackbudid{i}=[trackbudid{i} , bid];
                          if (segmentation.tcells1(cid).birthFrame>0 )
                              trackgeneration{i}=[trackgeneration{i} , find(segmentation.tcells1(cid).daughterList==bid)];
@@ -278,7 +283,7 @@ for i=1:maxtime-1
                                 childelta{i}=[childelta{i} , diff2 ] ;
                                 motherchildsize{i}=[motherchildsize{i} , volum2+volum4];
                                 motherchildelta{i}=[motherchildelta{i} , diff2 ];
-                                trackmotherid{i}=[trackmotherid{i} , cid];
+                                trackmotherid{i}=[trackmother{i} , cid];
                                 trackbudid{i}=[trackbudid{i} , bid];
                                 if (segmentation.tcells1(cid).birthFrame>0 )
                                     trackgeneration{i}=[trackgeneration{i} , find(segmentation.tcells1(cid).daughterList==bid)];
@@ -350,8 +355,6 @@ deltaout=delta1;
 track1.self=trackselfid;
 track1.mother=trackmotherid;
 track1.child=trackbudid;
-track1.generation=trackgeneration;
-track1.birth=trackbirth;
-tracking=track1;
+track1.mother=trackmotherid;
 end
 

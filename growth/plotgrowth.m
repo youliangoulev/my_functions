@@ -3,7 +3,7 @@ function plotgrowth( sizeini , deltaini , sms)
 %   Detailed explanation goes here
 
 
-fitting=0;
+fitting=1;
 born1=150;
 born2=950;
 framet=3;
@@ -211,7 +211,8 @@ xlabel('Cell volum (au)');
 ylabel('Cell growth rate (au)');
 title('Cell area and growth rate correlation');
 [ddddd , ppppp]=corrcoef(za ,zd);
-disp(['correlation between cell area and growth rate : ' , num2str(ppppp(1,2))]);
+disp(['correlation between cell area and growth rate : ' , num2str(ddddd(1,2))]);
+disp(['p-value for the correlation between cell area and growth rate : ' , num2str(ppppp(1,2))]);
 %=====================================================
 stop1=false;
 stop2=false;
