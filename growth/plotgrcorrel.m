@@ -1,6 +1,7 @@
 function [ output_args ] = plotgrcorrel( delta , track , x2 , x4)
 %UNTITLED3 Summary of this function goes here
 %   Detailed explanation goes here
+% x2 et x4 sont en frames !!!!!!!!!!!!!!!!!!
 [meandelta1 , totdelta1 , birth1 , gen1 ]=build(delta , track , 1 , x2);
 [meandelta2 , totdelta2 , birth2 , gen2 ]=build(delta , track , x4 , length(delta));
 [meandelta3 , totdelta3 , birth3 , gen3 ]=build(delta , track , 1 , length(delta));

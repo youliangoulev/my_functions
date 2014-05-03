@@ -202,7 +202,7 @@ for i=1:maxtime-1
              volum2=4*sqrt(surface2*surface2*surface2/pi)/3; 
              diff1=volum2-volum1;
 
-             if (diff1>=low_be)&&(diff1<=high_be) &&(segmentation.tcells1(cid).birthFrame>0 ) % &&(i>=segmentation.tcells1(cid).birthFrame)
+             if (diff1>=low_be)&&(diff1<=high_be) &&((segmentation.tcells1(cid).birthFrame>0 ) || ((~isempty(segmentation.tcells1(cid).divisionTimes))&&(i>=segmentation.tcells1(cid).divisionTimes(1))) )
                  selfsize{i}=[selfsize{i} , volum1];
                  selfdelta{i}=[selfdelta{i} , diff1];
                  trackselfid{i}=[trackselfid{i} , cid];
