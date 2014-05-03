@@ -58,7 +58,11 @@ for i=1:length(time)
             else
                 beg{i}=[beg{i} , fin{i}(c-1)+1];
             end;
-            fin{i}=[fin{i} , find(time{i}==div{i}(c))];
+            if find(time{i}==div{i}(c))
+                fin{i}=[fin{i} , find(time{i}==div{i}(c))];
+            else
+                fin{i}=[fin{i} , length(time{i})];
+            end;
         end;
     else
         beg{i}=1;
@@ -70,7 +74,11 @@ for i=1:length(time)
     end;
     smoothbud{i}=[];
     for c=1:length(beg{i})
+        if beg{i}(c)+ming1dur<fin{i}(c)
         tem=beg{i}(c)+ming1dur;
+        else
+        tem=fin{i}(c)-1;
+        end;
 %         for zzz=1:length(bud{i})
 %             if sum(time{i}(beg{i}(c):fin{i}(c))==bud{i}(zzz))
 %                 tem=find(time{i}==bud{i}(zzz));
@@ -96,11 +104,13 @@ for i=1:length(time)
         plot(time{i}(beg{i}(j):fin{i}(j))*framet , qqq , 'color' , colorses(i , :) , 'linewidth' , 1.1 );
         hold on;
     end;
-    if tot==0
-        continue;
-    end;
+    if tot>0
+        if smoothbud{i}(1)==0
+            smoothbud{i}(1)=1;
+        end;
     plot(time{i}(smoothbud{i}(1:tot))*framet , volum{i}(smoothbud{i}(1:tot)) , 'line' , 'none' , 'Marker' , 'o' , 'MarkerEdgeColor' , colorses(i , :) , 'MarkerFaceColor' , colorses(i , :) );
     hold on;
+    end;
 %     plot(time{i}(fin{i}) , volum{i}(fin{i}) , 'line' , 'none' , 'Marker' , 'o' , 'color' , 'b' , 'markersize' , 3);
 %     hold on;
 end;
