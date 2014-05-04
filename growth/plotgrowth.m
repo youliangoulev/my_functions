@@ -4,7 +4,7 @@ function plotgrowth( sizeini , deltaini , sms)
 
 
 fitting=1;
-born1=150;
+born1=80;
 born2=950;
 framet=3;
 %======================================
@@ -48,7 +48,7 @@ plot(xax , smooth(meandelta , sms) , 'color' , 'r' , 'LineWidth' , 2);
 set(gca,'FontSize',20)
 xlabel('Time (min)');
 ylabel('Mean growth rate per cell (au)');
-title('Cell growth rate'); 
+% title('Cell growth rate'); 
 %=====================================================
 if fitting
 cut1=round(born1/framet)+1;
@@ -147,7 +147,7 @@ errorbar(xax , smooth(meandelta , sms) , errordelta);
 set(gca,'FontSize',20)
 xlabel('Time (min)');
 ylabel('Mean growth rate per cell (au)');
-title('Cell growth rate'); 
+% title('Cell growth rate'); 
          
 if ranksum(temdelta{x2god} , temdelta{x3}) <= 0.05   %
 hold on;
@@ -179,14 +179,14 @@ plot(xax , smooth(meansize , sms) , 'color' , 'r' , 'LineWidth' , 2);
 set(gca,'FontSize',20)
 xlabel('Time (min)');
 ylabel('Mean volum per cell (au)');
-title('Cell volum');
+% title('Cell volum');
 %=====================================================
 figure;
 scatter(xt , za , 7 , 'b' , 'Marker' , '+');
 set(gca,'FontSize',20)
 xlabel('Time (min)');
 ylabel('Volum per cell (au)');
-title('Cell volum distribution');
+% title('Cell volum distribution');
 %=====================================================
 figure;
 errorbar(xax , smooth(grpersiz , sms) , errorgrpersiz);
@@ -195,21 +195,21 @@ plot(xax , smooth(grpersiz , sms) , 'color' , 'r' , 'LineWidth' , 2);
 set(gca,'FontSize',20)
 xlabel('Time (min)');
 ylabel('Mean growth rate per unit of volum (min-1)');
-title('Growth rate per volum'); 
+% title('Growth rate per volum'); 
 %=====================================================
 figure;
 plot(xax , num , 'LineStyle' , 'none' , 'MarkerSize', 6 , 'MarkerEdgeColor','k' , 'MarkerFaceColor','g' , 'Marker' , 's');
 set(gca,'FontSize',20)
 xlabel('Time (min)');
 ylabel('Number of analysed events');
-title('Statistical significance');
+% title('Statistical significance');
 %=====================================================
 figure ;
-scatter (za , zd) ;
+scatter (za , zd , 4 ) ;
 set(gca,'FontSize',20)
 xlabel('Cell volum (au)');
 ylabel('Cell growth rate (au)');
-title('Cell area and growth rate correlation');
+% title('Cell area and growth rate correlation');
 [ddddd , ppppp]=corrcoef(za ,zd);
 disp(['correlation between cell area and growth rate : ' , num2str(ddddd(1,2))]);
 disp(['p-value for the correlation between cell area and growth rate : ' , num2str(ppppp(1,2))]);
@@ -225,7 +225,7 @@ for i=1:length(delta)
         set(gca,'FontSize',20)
         xlabel('Cell area (au)');
         ylabel('Cell growth rate (au)');
-        title(['Cell area and growth rate correlation at ' , num2str(xax(i)) , 'min']);
+        % title(['Cell area and growth rate correlation at ' , num2str(xax(i)) , 'min']);
         continue;
     end;
     if (length(delta{i})>50)&&(~stop2)
@@ -235,7 +235,7 @@ for i=1:length(delta)
         set(gca,'FontSize',20)
         xlabel('Cell area (au)');
         ylabel('Cell growth rate (au)');
-        title(['Cell area and growth rate correlation at ' , num2str(xax(i)) , 'min']);
+        % title(['Cell area and growth rate correlation at ' , num2str(xax(i)) , 'min']);
         continue;
     end;
     if (length(delta{i})>70)&&(~stop3)
@@ -245,7 +245,7 @@ for i=1:length(delta)
         set(gca,'FontSize',20)
         xlabel('Cell area (au)');
         ylabel('Cell growth rate (au)');
-        title(['Cell area and growth rate correlation at ' , num2str(xax(i)) , 'min']);
+        % title(['Cell area and growth rate correlation at ' , num2str(xax(i)) , 'min']);
         continue;
     end;
 end;

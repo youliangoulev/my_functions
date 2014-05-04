@@ -23,7 +23,7 @@ disp(['adaptation growth and birth time correlation : ' , num2str(ddddd1(1,2)) ,
 figure;
 scatter(gen5 , meandelta5);
 [ddddd2 , ppppp2]=corrcoef(gen5 , meandelta5);
-disp(['growth and age correlation : ' , num2str(ddddd2(1,2)) , ' p-value : ' , num2str(ppppp2(1,2)) ]);
+disp(['growth and age correlation : ' , num2str(ddddd2) , ' p-value : ' , num2str(ppppp2) ]);
 [ddddd3 , ppppp3]=ttest2([meandelta1{:}] , [meandelta2{:}] );
 disp(['mean1 : ' , num2str(mean([meandelta1{:}] )) , ' mean2 :' , num2str(mean([meandelta2{:}] )) , ' p-value : ' , num2str(ppppp3) ]);
 end
