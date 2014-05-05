@@ -1,4 +1,4 @@
-function [ output_args ] = cell_cycle( stresstiming , resolution , chanelfluo )
+function [ before , during , after ] = cell_cycle( stresstiming , resolution , chanelfluo )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -124,6 +124,9 @@ figure;
 hist(during_duration*framet , x);
 figure;
 hist(after_duration*framet , x);
+before=before_duration*framet;
+during=during_duration*framet;
+after=after_duration*framet;
 end
 %% outlayers function
 function [aut]=outlayers(resolution ,chanelfluo)

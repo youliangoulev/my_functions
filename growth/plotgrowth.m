@@ -4,7 +4,7 @@ function plotgrowth( sizeini , deltaini , sms)
 
 
 fitting=1;
-born1=80;
+born1=108;
 born2=950;
 framet=3;
 %======================================
@@ -35,7 +35,7 @@ for i=1:length(delta)
     meandelta=[meandelta , mean(delta{i})];
     meansize=[meansize , mean(size{i})];
     errordelta=[errordelta , std(delta{i})/sqrt(length(delta{i}))];
-    errorsize=[errorsize , std(size{i})/sqrt(length(size{i}))];
+    errorsize=[errorsize , std(size{i})]; %/sqrt(length(size{i}))];
     num=[num , length(size{i})];
     grpersiz=[grpersiz , sum(delta{i})/sum(size{i})];
     errorgrpersiz=[errorgrpersiz , sqrt((length(delta{i})*std(delta{i})*std(delta{i})/sum(size{i})^2)+((sum(delta{i})^2)*length(delta{i})*std(size{i})*std(size{i})/sum(size{i})^4))];
@@ -148,7 +148,6 @@ set(gca,'FontSize',20)
 xlabel('Time (min)');
 ylabel('Mean growth rate per cell (au)');
 % title('Cell growth rate'); 
-         
 if ranksum(temdelta{x2god} , temdelta{x3}) <= 0.05   %
 hold on;
 plot(mxax(x1:x2god) , a1*mxax(x1:x2god)+b1 , 'color' , 'r' , 'LineWidth',2);
@@ -159,6 +158,8 @@ plot(mxax(x3:x4god) , a3*mxax(x3:x4god)+b3 , 'color' , 'r' , 'LineWidth',2);
 hold on;
 plot(mxax(x4god:x5) , a4*mxax(x4god:x5)+b4 , 'color' , 'r' , 'LineWidth',2);
 hold on;
+disp(['time limit 1 : ' , num2str(x2god) , 'frame']);
+disp(['time limit 2 : ' , num2str(x4god) , 'frame']);
 else
     
     
@@ -168,8 +169,6 @@ else
         hold on;
         plot(mxax(x1:x5) , a3*mxax(x1:x5)+b3 , 'color' , 'r' , 'LineWidth',2);
 end; 
-disp(['time limit 1 : ' , num2str(x2god) , 'frame']);
-disp(['time limit 2 : ' , num2str(x4god) , 'frame']);
 end;
 %=====================================================
 figure;
